@@ -14,9 +14,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/neetozone/neetokb-cli/internal/commands.Version={{.Version}}
-      - -X github.com/neetozone/neetokb-cli/internal/commands.Commit={{.ShortCommit}}
-      - -X github.com/neetozone/neetokb-cli/internal/commands.Date={{.Date}}
+      - -X github.com/neetozone/neeto-kb-cli/internal/commands.Version={{.Version}}
+      - -X github.com/neetozone/neeto-kb-cli/internal/commands.Commit={{.ShortCommit}}
+      - -X github.com/neetozone/neeto-kb-cli/internal/commands.Date={{.Date}}
 
 archives:
   - format: tar.gz
