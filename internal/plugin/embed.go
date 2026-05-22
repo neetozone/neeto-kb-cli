@@ -53,8 +53,8 @@ func ExtractClaudePlugin(dest string) error {
 			"name":  "BigBinary",
 			"email": "support@bigbinary.com",
 		},
-		"homepage":   "https://github.com/neetozone/neetokb-cli",
-		"repository": "https://github.com/neetozone/neetokb-cli",
+		"homepage":   "https://github.com/neetozone/neeto-kb-cli",
+		"repository": "https://github.com/neetozone/neeto-kb-cli",
 	}
 	manifestJSON, _ := json.MarshalIndent(manifest, "", "  ")
 	if err := writeFile(filepath.Join(dest, ".claude-plugin", "plugin.json"), manifestJSON, 0o644); err != nil {

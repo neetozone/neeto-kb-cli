@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/neetozone/neetokb-cli/internal/plugin"
+	"github.com/neetozone/neeto-kb-cli/internal/plugin"
 	"github.com/spf13/cobra"
 )
 

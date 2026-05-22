@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/neetozone/neetokb-cli/internal/output"
+	"github.com/neetozone/neeto-kb-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 

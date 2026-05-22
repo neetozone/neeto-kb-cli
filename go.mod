@@ -1,4 +1,4 @@
-module github.com/neetozone/neetokb-cli
+module github.com/neetozone/neeto-kb-cli
 
 go 1.26.1
 

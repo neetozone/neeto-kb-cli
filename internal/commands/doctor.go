@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/neetozone/neetokb-cli/internal/auth"
+	"github.com/neetozone/neeto-kb-cli/internal/auth"
 	"github.com/spf13/cobra"
 )
 

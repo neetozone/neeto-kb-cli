@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/neetozone/neetokb-cli/internal/auth"
-	"github.com/neetozone/neetokb-cli/internal/client"
-	"github.com/neetozone/neetokb-cli/internal/output"
+	"github.com/neetozone/neeto-kb-cli/internal/auth"
+	"github.com/neetozone/neeto-kb-cli/internal/client"
+	"github.com/neetozone/neeto-kb-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 
