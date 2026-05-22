@@ -1,0 +1,14 @@
+{
+  "name": "neetokb",
+  "owner": {
+    "name": "BigBinary",
+    "email": "support@bigbinary.com"
+  },
+  "plugins": [
+    {
+      "name": "neetokb",
+      "source": "./",
+      "description": "NeetoKB CLI"
+    }
+  ]
+}
