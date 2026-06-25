@@ -223,6 +223,10 @@ func TestPrintPretty_SingleResourceFlattenedRendersScalars(t *testing.T) {
 			t.Errorf("output missing %q; output:\n%s", want, out)
 		}
 	}
+
+	if strings.Contains(out, "ARTICLE") {
+		t.Errorf("single-key envelope should be flattened, so the ARTICLE header should not appear; output:\n%s", out)
+	}
 }
 
 func TestPrintWithPagination_JSONEnvelope(t *testing.T) {
