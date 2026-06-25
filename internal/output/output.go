@@ -31,7 +31,7 @@ var (
 
 // priorityFields controls which columns appear in tables and their order.
 var priorityFields = []string{
-	"sid", "name", "title", "email", "status", "kind", "type",
+	"sid", "name", "title", "email", "state", "status", "kind", "type",
 	"slug", "duration", "spot", "disabled", "default",
 	"host_name", "host_email", "starts_at", "ends_at", "time_zone",
 	"event", "amount", "currency", "wday", "start_time", "end_time",
@@ -42,6 +42,8 @@ const (
 	maxTableColumns = 7
 	minColWidth     = 6
 	colPadding      = 3
+	maxRenderDepth  = 3
+	maxPreviewLen   = 100
 )
 
 func IsTTY() bool {
@@ -247,35 +249,16 @@ func printTable(rows []map[string]interface{}) {
 }
 
 func pickColumns(sample map[string]interface{}) []string {
-	scalars := map[string]bool{}
+	var scalarKeys []string
 	for k, v := range sample {
 		if isScalar(v) {
-			scalars[k] = true
+			scalarKeys = append(scalarKeys, k)
 		}
 	}
 
-	var cols []string
-	used := map[string]bool{}
-
-	for _, f := range priorityFields {
-		if scalars[f] && !used[f] && len(cols) < maxTableColumns {
-			cols = append(cols, f)
-			used[f] = true
-		}
-	}
-
-	var remaining []string
-	for k := range scalars {
-		if !used[k] {
-			remaining = append(remaining, k)
-		}
-	}
-	sort.Strings(remaining)
-	for _, k := range remaining {
-		if len(cols) >= maxTableColumns {
-			break
-		}
-		cols = append(cols, k)
+	cols := orderedKeys(scalarKeys)
+	if len(cols) > maxTableColumns {
+		cols = cols[:maxTableColumns]
 	}
 
 	return cols
@@ -315,22 +298,14 @@ func calculateWidths(headers []string, grid [][]string) []int {
 func printKeyValue(obj map[string]interface{}, rawData json.RawMessage) {
 	fields := fieldOrder(rawData)
 	if len(fields) == 0 {
-		for k := range obj {
-			fields = append(fields, k)
-		}
-		sort.Strings(fields)
+		fields = orderedKeys(keysOf(obj))
 	}
+	renderFields(obj, fields, 1)
+}
 
-	maxLabelLen := 0
-	for _, k := range fields {
-		if _, ok := obj[k]; !ok {
-			continue
-		}
-		label := formatHeader(k)
-		if len(label) > maxLabelLen {
-			maxLabelLen = len(label)
-		}
-	}
+func renderFields(obj map[string]interface{}, fields []string, depth int) {
+	indent := strings.Repeat("  ", depth)
+	labelWidth := maxLabelWidth(obj, fields)
 
 	for _, k := range fields {
 		v, ok := obj[k]
@@ -339,17 +314,105 @@ func printKeyValue(obj map[string]interface{}, rawData json.RawMessage) {
 		}
 		label := formatHeader(k)
 
-		if isScalar(v) {
-			fmt.Printf("  %-*s  %s\n", maxLabelLen, label, formatValue(v))
-		} else {
-			compact, _ := json.Marshal(v)
-			if len(compact) <= 80 {
-				fmt.Printf("  %-*s  %s\n", maxLabelLen, label, string(compact))
+		switch val := v.(type) {
+		case map[string]interface{}:
+			if depth < maxRenderDepth && len(val) > 0 {
+				fmt.Printf("%s%s\n", indent, label)
+				renderFields(val, orderedKeys(keysOf(val)), depth+1)
 			} else {
-				fmt.Printf("  %-*s  (%s)\n", maxLabelLen, label, describeValue(v))
+				fmt.Printf("%s%-*s  %s\n", indent, labelWidth, label, summarizeObject(val))
 			}
+		case []interface{}:
+			fmt.Printf("%s%-*s  %s\n", indent, labelWidth, label, formatArray(val))
+		default:
+			fmt.Printf("%s%-*s  %s\n", indent, labelWidth, label, previewScalar(v))
 		}
 	}
+}
+
+func keysOf(obj map[string]interface{}) []string {
+	keys := make([]string, 0, len(obj))
+	for k := range obj {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func orderedKeys(keys []string) []string {
+	remaining := make(map[string]bool, len(keys))
+	for _, k := range keys {
+		remaining[k] = true
+	}
+
+	var ordered []string
+	for _, f := range priorityFields {
+		if remaining[f] {
+			ordered = append(ordered, f)
+			delete(remaining, f)
+		}
+	}
+
+	var rest []string
+	for _, k := range keys {
+		if remaining[k] {
+			rest = append(rest, k)
+		}
+	}
+	sort.Strings(rest)
+
+	return append(ordered, rest...)
+}
+
+func maxLabelWidth(obj map[string]interface{}, fields []string) int {
+	width := 0
+	for _, k := range fields {
+		if _, ok := obj[k]; !ok {
+			continue
+		}
+		if l := len(formatHeader(k)); l > width {
+			width = l
+		}
+	}
+	return width
+}
+
+func previewScalar(v interface{}) string {
+	s := strings.TrimSpace(strings.ReplaceAll(formatValue(v), "\n", " "))
+	return truncate(s, maxPreviewLen)
+}
+
+func formatArray(arr []interface{}) string {
+	if len(arr) == 0 {
+		return "(0 items)"
+	}
+
+	allScalar := true
+	for _, v := range arr {
+		if !isScalar(v) {
+			allScalar = false
+			break
+		}
+	}
+
+	if allScalar {
+		parts := make([]string, len(arr))
+		for i, v := range arr {
+			parts[i] = formatValue(v)
+		}
+		if joined := strings.Join(parts, ", "); len(joined) <= maxPreviewLen {
+			return joined
+		}
+	}
+
+	return fmt.Sprintf("(%d items)", len(arr))
+}
+
+func summarizeObject(val map[string]interface{}) string {
+	compact, _ := json.Marshal(val)
+	if len(compact) <= 80 {
+		return string(compact)
+	}
+	return fmt.Sprintf("(%d fields)", len(val))
 }
 
 func fieldOrder(data json.RawMessage) []string {
@@ -483,17 +546,6 @@ func formatValue(v interface{}) string {
 		return val
 	default:
 		return fmt.Sprintf("%v", val)
-	}
-}
-
-func describeValue(v interface{}) string {
-	switch val := v.(type) {
-	case []interface{}:
-		return fmt.Sprintf("%d items", len(val))
-	case map[string]interface{}:
-		return fmt.Sprintf("%d fields", len(val))
-	default:
-		return "..."
 	}
 }
 

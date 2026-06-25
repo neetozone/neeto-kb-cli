@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -139,6 +141,91 @@ func TestPrintWithPagination_QuietMode(t *testing.T) {
 	trimmed := strings.TrimSpace(out)
 	if trimmed != `[{"id":1}]` {
 		t.Errorf("quiet output = %q, want raw data without pagination", trimmed)
+	}
+}
+
+func TestPrintPretty_NestedArticleEnvelopeRendersFields(t *testing.T) {
+	ForceJSON = false
+	QuietMode = false
+	ToonMode = false
+
+	longContent := "<p>" + strings.Repeat("lorem ipsum ", 40) + "</p>"
+	data := json.RawMessage(`{
+		"article": {
+			"title": "Getting started with NeetoKB CLI",
+			"slug": "getting-started",
+			"state": "draft",
+			"category": {"id": 5, "name": "Onboarding", "slug": "onboarding"},
+			"html_content": ` + strconv.Quote(longContent) + `
+		},
+		"meta": {"url": "https://example.test", "page_title": "Getting started"}
+	}`)
+
+	out := captureStdout(t, func() {
+		printPretty(data)
+	})
+
+	for _, want := range []string{
+		"TITLE", "Getting started with NeetoKB CLI",
+		"SLUG", "getting-started",
+		"STATE", "draft",
+		"CATEGORY", "Onboarding",
+		"META",
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output missing %q\n--- output ---\n%s", want, out)
+		}
+	}
+
+	if strings.Contains(out, "fields)") {
+		t.Errorf("nested object was collapsed to (N fields) instead of being rendered:\n%s", out)
+	}
+
+	if !strings.Contains(out, "...") {
+		t.Errorf("long html_content should be truncated to a preview with an ellipsis:\n%s", out)
+	}
+	if strings.Contains(out, "lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum") {
+		t.Errorf("long html_content should not be printed in full:\n%s", out)
+	}
+}
+
+func TestPickColumns_PriorityThenAlphabeticalScalarsOnly(t *testing.T) {
+	sample := map[string]interface{}{
+		"title":  "t",
+		"slug":   "s",
+		"email":  "e",
+		"zebra":  "z",
+		"apple":  "a",
+		"nested": map[string]interface{}{"x": 1},
+	}
+
+	got := pickColumns(sample)
+	want := []string{"title", "email", "slug", "apple", "zebra"}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("pickColumns() = %v, want %v", got, want)
+	}
+}
+
+func TestPrintPretty_SingleResourceFlattenedRendersScalars(t *testing.T) {
+	ForceJSON = false
+	QuietMode = false
+	ToonMode = false
+
+	data := json.RawMessage(`{"article":{"id":"a-12345678","title":"Updated draft title","slug":"updated","state":"draft"}}`)
+
+	out := captureStdout(t, func() {
+		printPretty(data)
+	})
+
+	for _, want := range []string{"TITLE", "Updated draft title", "STATE", "draft"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("output missing %q; output:\n%s", want, out)
+		}
+	}
+
+	if strings.Contains(out, "ARTICLE") {
+		t.Errorf("single-key envelope should be flattened, so the ARTICLE header should not appear; output:\n%s", out)
 	}
 }
 
