@@ -4,14 +4,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var settingsCmd = &cobra.Command{
-	Use:   "settings",
-	Short: "Manage workspace settings",
+var workspaceCmd = &cobra.Command{
+	Use:   "workspace",
+	Short: "Manage workspace",
 }
 
-var settingsShowCmd = &cobra.Command{
-	Use:   "show",
-	Short: "Show workspace settings",
+var workspaceInfoCmd = &cobra.Command{
+	Use:   "info",
+	Short: "Show workspace information",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, err := getClient(cmd)
 		if err != nil {
@@ -29,6 +29,6 @@ var settingsShowCmd = &cobra.Command{
 }
 
 func init() {
-	settingsCmd.AddCommand(settingsShowCmd)
-	rootCmd.AddCommand(settingsCmd)
+	workspaceCmd.AddCommand(workspaceInfoCmd)
+	rootCmd.AddCommand(workspaceCmd)
 }
