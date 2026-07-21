@@ -16,9 +16,12 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:           "neetokb",
-	Short:         "NeetoKB CLI",
-	Long:          "A command-line interface for NeetoKB.",
+	Use:   "neetokb",
+	Short: "NeetoKB CLI",
+	Long:  "A command-line interface for NeetoKB.",
+	Example: "  $ neetokb articles list\n" +
+		"  $ neetokb articles show <id>\n" +
+		"  $ neetokb categories list",
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
