@@ -52,7 +52,7 @@ var articlesUnlistedLinksRegenerateCmd = &cobra.Command{
 			body["expiration_date"] = v
 		}
 
-		data, err := c.Post(fmt.Sprintf("/articles/%s/unlisted_link/regenerate", args[0]), body)
+		data, err := c.Put(fmt.Sprintf("/articles/%s/unlisted_link", args[0]), body)
 		if err != nil {
 			return err
 		}
