@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	brewFormula   = "neetozone/homebrew-tap/neetokb"
-	installShURL  = "https://neeto-downloads.s3.amazonaws.com/cli/NeetoKB/latest/install.sh"
-	installPS1URL = "https://neeto-downloads.s3.amazonaws.com/cli/NeetoKB/latest/install.ps1"
+	brewFormula   = "neetozone/tap/neetokb"
+	installShURL  = "https://neetokb.com/cli/install.sh"
+	installPS1URL = "https://neetokb.com/cli/install.ps1"
 )
 
 var updateCmd = &cobra.Command{

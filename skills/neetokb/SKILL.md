@@ -128,6 +128,25 @@ stderr. Common errors the agent should expect:
 
 ## Product-specific commands
 
-This skeleton CLI does not yet ship product-specific resource commands.
-Run `neetokb commands` to see what is currently available, and
-refer to the CLI's own docs for the full command reference once it grows.
+| Group | Commands |
+|---|---|
+| `articles` | `list`, `show`, `create`, `update` |
+| `articles unlisted-links` | `get`, `regenerate` |
+| `categories` | `list` |
+| `authors` | `list` |
+| `recommendations` | `list` |
+| `search` | (top-level) full-text article search; `--search-term` required |
+| `team-members` | `list`, `show`, `create`, `update`, `delete` |
+| `workspace` | `info` |
+
+Article commands accept the article's slug, its permalink identifier
+(`a-XXXXXXXX`), or its UUID as `<id>`.
+
+Unlisted links exist only for published articles; requesting one for a draft
+errors with "Article must be published before an unlisted link can be
+generated." `regenerate` invalidates the previous URL immediately and takes
+`--expiration-type` (`never`, `one_day`, `seven_days`, `thirty_days`,
+`custom`) with `--expiration-date` required only for `custom`.
+
+Run `neetokb commands` for the authoritative flag list, and see
+<https://apidocs.neetokb.com/cli/introduction> for the full reference.

@@ -249,3 +249,53 @@ func TestPrintWithPagination_JSONEnvelope(t *testing.T) {
 		t.Error("pagination should be present in envelope")
 	}
 }
+
+func TestPickColumns_RealResourcePayloads(t *testing.T) {
+	tests := []struct {
+		name   string
+		sample map[string]interface{}
+		want   []string
+	}{
+		{
+			name: "articles list",
+			sample: map[string]interface{}{
+				"id": "a1", "slug": "getting-started", "title": "Getting Started",
+				"state": "published", "unique_views_count": float64(42),
+				"category": map[string]interface{}{"id": "c1", "name": "Guides"},
+			},
+			want: []string{"id", "title", "slug", "state", "unique_views_count"},
+		},
+		{
+			name: "team-members list",
+			sample: map[string]interface{}{
+				"id": "t1", "email": "oliver@example.com", "first_name": "Oliver",
+				"last_name": "Smith", "time_zone": "Asia/Kolkata",
+				"profile_image_url": nil, "active": true, "organization_role": "Admin",
+			},
+			want: []string{"id", "email", "first_name", "last_name", "organization_role", "time_zone", "active"},
+		},
+		{
+			name: "authors list",
+			sample: map[string]interface{}{
+				"name": "Oliver Smith", "email": "oliver@example.com", "profile_image_url": nil,
+			},
+			want: []string{"name", "email", "profile_image_url"},
+		},
+		{
+			name: "categories list",
+			sample: map[string]interface{}{
+				"id": "c1", "name": "Guides", "slug": "guides", "description": nil,
+				"articles_count": float64(12), "categories_count": float64(2), "total_articles_count": float64(18),
+			},
+			want: []string{"id", "name", "slug", "articles_count", "categories_count", "description", "total_articles_count"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := pickColumns(tt.sample); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("pickColumns() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

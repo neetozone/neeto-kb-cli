@@ -9,8 +9,7 @@ A command-line interface for NeetoKB.
 **Homebrew (recommended on macOS):**
 
 ```bash
-brew trust neetozone/tap
-brew install neetozone/homebrew-tap/neetokb
+brew install neetozone/tap/neetokb
 ```
 
 **Shell script:**
