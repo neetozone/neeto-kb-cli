@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/alpkeskin/gotoon"
 	"golang.org/x/term"
@@ -38,7 +39,9 @@ var priorityFields = []string{
 
 const (
 	maxTableColumns = 7
-	minColWidth     = 6
+	ellipsis        = "..."
+	minContentWidth = 10
+	minColWidth     = minContentWidth + len(ellipsis)
 	colPadding      = 3
 	maxRenderDepth  = 3
 	maxPreviewLen   = 100
@@ -196,7 +199,7 @@ func printPretty(data json.RawMessage) {
 }
 
 func printTable(rows []map[string]interface{}) {
-	cols := pickColumns(rows[0])
+	cols := pickColumns(rows)
 	if len(cols) == 0 {
 		out, _ := json.MarshalIndent(rows, "", "  ")
 		fmt.Println(string(out))
@@ -223,7 +226,11 @@ func printTable(rows []map[string]interface{}) {
 		if i > 0 {
 			fmt.Print(pad)
 		}
-		fmt.Printf("%-*s", widths[i], truncate(h, widths[i]))
+		cell := truncate(h, widths[i])
+		if i < len(headers)-1 {
+			cell = padRight(cell, widths[i])
+		}
+		fmt.Print(cell)
 	}
 	fmt.Println()
 
@@ -240,37 +247,69 @@ func printTable(rows []map[string]interface{}) {
 			if i > 0 {
 				fmt.Print(pad)
 			}
-			fmt.Printf("%-*s", widths[i], truncate(val, widths[i]))
+			cell := truncate(val, widths[i])
+			if i < len(row)-1 {
+				cell = padRight(cell, widths[i])
+			}
+			fmt.Print(cell)
 		}
 		fmt.Println()
 	}
 }
 
-func pickColumns(sample map[string]interface{}) []string {
-	var scalarKeys []string
-	for k, v := range sample {
+func pickColumns(rows []map[string]interface{}) []string {
+	scalars := map[string]bool{}
+	for k, v := range rows[0] {
 		if isScalar(v) {
+			scalars[k] = true
+		}
+	}
+
+	urlFields := map[string]bool{}
+	var urlCols []string
+	for _, row := range rows {
+		for k, v := range row {
+			if !scalars[k] || urlFields[k] {
+				continue
+			}
+			if s, ok := v.(string); ok && isURL(s) {
+				urlFields[k] = true
+				urlCols = append(urlCols, k)
+			}
+		}
+	}
+	sort.Strings(urlCols)
+
+	budget := max(1, maxTableColumns-len(urlCols))
+
+	var scalarKeys []string
+	for k := range scalars {
+		if !urlFields[k] {
 			scalarKeys = append(scalarKeys, k)
 		}
 	}
 
 	cols := orderedKeys(scalarKeys)
-	if len(cols) > maxTableColumns {
-		cols = cols[:maxTableColumns]
+	if len(cols) > budget {
+		cols = cols[:budget]
 	}
 
-	return cols
+	return append(cols, urlCols...)
 }
 
 func calculateWidths(headers []string, grid [][]string) []int {
 	widths := make([]int, len(headers))
+	protected := make([]bool, len(headers))
 	for i, h := range headers {
-		widths[i] = len(h)
+		widths[i] = displayWidth(h)
 	}
 	for _, row := range grid {
 		for i, val := range row {
-			if len(val) > widths[i] {
-				widths[i] = len(val)
+			if w := displayWidth(val); w > widths[i] {
+				widths[i] = w
+			}
+			if isURL(val) {
+				protected[i] = true
 			}
 		}
 	}
@@ -279,14 +318,24 @@ func calculateWidths(headers []string, grid [][]string) []int {
 	totalPad := (len(headers) - 1) * colPadding
 	available := termWidth - totalPad
 
-	total := 0
-	for _, w := range widths {
+	total, flexible := 0, 0
+	for i, w := range widths {
 		total += w
+		if !protected[i] {
+			flexible += w
+		}
 	}
 
-	if total > available {
-		for i := range widths {
-			widths[i] = max(minColWidth, widths[i]*available/total)
+	if total <= available || flexible == 0 {
+		return widths
+	}
+
+	// URL columns keep their full width; the rest absorb the shortfall, but
+	// never shrink past minColWidth nor grow beyond what their content needs.
+	budget := max(0, available-(total-flexible))
+	for i := range widths {
+		if !protected[i] {
+			widths[i] = min(widths[i], max(minColWidth, widths[i]*budget/flexible))
 		}
 	}
 
@@ -407,7 +456,7 @@ func formatArray(arr []interface{}) string {
 
 func summarizeObject(val map[string]interface{}) string {
 	compact, _ := json.Marshal(val)
-	if len(compact) <= 80 {
+	if len(compact) <= 80 || containsURL(val) {
 		return string(compact)
 	}
 	return fmt.Sprintf("(%d fields)", len(val))
@@ -547,14 +596,53 @@ func formatValue(v interface{}) string {
 	}
 }
 
+func isURL(s string) bool {
+	return strings.HasPrefix(s, "http://") || strings.HasPrefix(s, "https://")
+}
+
+func containsURL(v interface{}) bool {
+	switch val := v.(type) {
+	case string:
+		return isURL(val)
+	case []interface{}:
+		for _, item := range val {
+			if containsURL(item) {
+				return true
+			}
+		}
+	case map[string]interface{}:
+		for _, item := range val {
+			if containsURL(item) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func displayWidth(s string) int {
+	return utf8.RuneCountInString(s)
+}
+
+func padRight(s string, width int) string {
+	if gap := width - displayWidth(s); gap > 0 {
+		return s + strings.Repeat(" ", gap)
+	}
+	return s
+}
+
 func truncate(s string, maxLen int) string {
-	if len(s) <= maxLen {
+	if maxLen < 0 {
+		maxLen = 0
+	}
+	if displayWidth(s) <= maxLen || isURL(s) {
 		return s
 	}
-	if maxLen <= 3 {
-		return s[:maxLen]
+	runes := []rune(s)
+	if maxLen <= len(ellipsis) {
+		return string(runes[:maxLen])
 	}
-	return s[:maxLen-3] + "..."
+	return string(runes[:maxLen-len(ellipsis)]) + ellipsis
 }
 
 func getTerminalWidth() int {
