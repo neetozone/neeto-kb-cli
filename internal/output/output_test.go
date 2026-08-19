@@ -199,7 +199,7 @@ func TestPickColumns_PriorityThenAlphabeticalScalarsOnly(t *testing.T) {
 		"nested": map[string]interface{}{"x": 1},
 	}
 
-	got := pickColumns(sample)
+	got := pickColumns([]map[string]interface{}{sample})
 	want := []string{"title", "email", "slug", "apple", "zebra"}
 
 	if !reflect.DeepEqual(got, want) {
@@ -293,7 +293,7 @@ func TestPickColumns_RealResourcePayloads(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := pickColumns(tt.sample); !reflect.DeepEqual(got, tt.want) {
+			if got := pickColumns([]map[string]interface{}{tt.sample}); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("pickColumns() = %v, want %v", got, tt.want)
 			}
 		})
