@@ -109,7 +109,14 @@ VERSION, runs GoReleaser, uploads artifacts to
 neetokb setup claude      # Register plugin with Claude Code
 neetokb setup cursor      # Write .cursor/rules/neetokb.mdc
 neetokb setup windsurf    # Write .windsurf/rules/neetokb.md
-neetokb setup copilot     # Append to .github/copilot-instructions.md
-neetokb setup gemini      # Append to GEMINI.md
-neetokb setup codex       # Append to AGENTS.md
+neetokb setup copilot     # Add a NeetoKB section to .github/copilot-instructions.md
+neetokb setup gemini      # Add a NeetoKB section to GEMINI.md
+neetokb setup codex       # Add a NeetoKB section to AGENTS.md
 ```
+
+Every command except `setup claude` writes into the current project directory, so
+run these commands from the root of the project the assistant works in. Re-run
+them after every upgrade: `setup cursor` and `setup windsurf` overwrite their rule
+file, while `setup copilot`, `setup gemini` and `setup codex` keep the existing
+content of their file and replace only the NeetoKB section instead of adding a
+duplicate.
