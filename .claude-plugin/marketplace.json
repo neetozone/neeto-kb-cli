@@ -8,7 +8,7 @@
     {
       "name": "neetokb",
       "source": "./",
-      "description": "NeetoKB CLI"
+      "description": "manage articles, categories and search from the terminal"
     }
   ]
 }

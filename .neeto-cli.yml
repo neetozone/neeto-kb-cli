@@ -1,0 +1,11 @@
+pretty_name: NeetoKB
+binary_name: neetokb
+short_description: manage articles, categories and search from the terminal
+long_description: A command-line interface for NeetoKB. Manage articles and unlisted links, browse categories, and search your knowledge base.
+api_base_path: /api/external/v2
+root_examples:
+  - neetokb articles list
+  - neetokb search "billing"
+  - neetokb categories list
+priority_fields: [name, title, email, first_name, last_name, slug, state, status, organization_role, category, url, time_zone, kind, type, disabled, default]
+commons_version: main

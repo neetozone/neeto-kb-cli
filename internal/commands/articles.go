@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/neetozone/neeto-kb-cli/internal/output"
+	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
 )
 
@@ -173,5 +173,5 @@ func init() {
 	articlesCmd.AddCommand(articlesShowCmd)
 	articlesCmd.AddCommand(articlesCreateCmd)
 	articlesCmd.AddCommand(articlesUpdateCmd)
-	rootCmd.AddCommand(articlesCmd)
+	register(func(root *cobra.Command) { root.AddCommand(articlesCmd) })
 }
