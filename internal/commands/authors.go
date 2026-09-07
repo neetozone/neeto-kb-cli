@@ -25,7 +25,7 @@ var authorsListCmd = &cobra.Command{
 		}
 
 		printList(data, "authors", []output.Breadcrumb{
-			{Label: "List articles", Command: binaryName() + " articles list"},
+			{Label: "List articles", Command: "neetokb articles list"},
 		})
 		return nil
 	},

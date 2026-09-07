@@ -28,7 +28,7 @@ var articlesUnlistedLinksGetCmd = &cobra.Command{
 		}
 
 		printResource(data, []output.Breadcrumb{
-			{Label: "Regenerate", Command: binaryName() + " articles unlisted-links regenerate <article-id>"},
+			{Label: "Regenerate", Command: "neetokb articles unlisted-links regenerate <article-id>"},
 		})
 		return nil
 	},
@@ -58,7 +58,7 @@ var articlesUnlistedLinksRegenerateCmd = &cobra.Command{
 		}
 
 		printActionResult(data, []output.Breadcrumb{
-			{Label: "Get", Command: binaryName() + " articles unlisted-links get <article-id>"},
+			{Label: "Get", Command: "neetokb articles unlisted-links get <article-id>"},
 		})
 		return nil
 	},
