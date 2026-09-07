@@ -30,5 +30,5 @@ var workspaceInfoCmd = &cobra.Command{
 
 func init() {
 	workspaceCmd.AddCommand(workspaceInfoCmd)
-	rootCmd.AddCommand(workspaceCmd)
+	register(func(root *cobra.Command) { root.AddCommand(workspaceCmd) })
 }

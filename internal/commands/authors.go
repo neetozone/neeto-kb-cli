@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/neetozone/neeto-kb-cli/internal/output"
+	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
 )
 
@@ -35,5 +35,5 @@ func init() {
 	addPaginationFlags(authorsListCmd)
 
 	authorsCmd.AddCommand(authorsListCmd)
-	rootCmd.AddCommand(authorsCmd)
+	register(func(root *cobra.Command) { root.AddCommand(authorsCmd) })
 }

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/neetozone/neeto-kb-cli/internal/output"
+	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
 )
 
@@ -36,5 +36,5 @@ func init() {
 	searchCmd.Flags().String("search-term", "", "Search query")
 	_ = searchCmd.MarkFlagRequired("search-term")
 
-	rootCmd.AddCommand(searchCmd)
+	register(func(root *cobra.Command) { root.AddCommand(searchCmd) })
 }

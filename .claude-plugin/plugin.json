@@ -1,10 +1,10 @@
 {
   "name": "neetokb",
-  "description": "NeetoKB CLI",
+  "description": "manage articles, categories and search from the terminal",
   "author": {
     "name": "BigBinary",
     "email": "support@bigbinary.com"
   },
-  "homepage": "https://github.com/neetozone/neetokb-cli",
-  "repository": "https://github.com/neetozone/neetokb-cli"
+  "homepage": "https://github.com/neetozone/neeto-kb-cli",
+  "repository": "https://github.com/neetozone/neeto-kb-cli"
 }

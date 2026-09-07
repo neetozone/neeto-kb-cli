@@ -3,7 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/neetozone/neeto-kb-cli/internal/output"
+	"github.com/neetozone/neeto-cli-commons/cli"
+	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
 )
 
@@ -85,7 +86,8 @@ var articlesCreateCmd = &cobra.Command{
 		slug, _ := cmd.Flags().GetString("slug")
 		htmlContent, _ := cmd.Flags().GetString("html-content")
 		state, _ := cmd.Flags().GetString("state")
-		category, _ := cmd.Flags().GetStringSlice("category")
+		categoryFlag, _ := cmd.Flags().GetString("category")
+		category := cli.SplitCSV(categoryFlag)
 
 		article := map[string]interface{}{
 			"category": category,
@@ -161,7 +163,7 @@ func init() {
 	articlesCreateCmd.Flags().String("slug", "", "Article slug")
 	articlesCreateCmd.Flags().String("html-content", "", "Article HTML content")
 	articlesCreateCmd.Flags().String("state", "", "Article state (draft/published)")
-	articlesCreateCmd.Flags().StringSlice("category", nil, "Category path (comma-separated, e.g. 'Parent,Child')")
+	articlesCreateCmd.Flags().String("category", "", "Category path (comma-separated, e.g. 'Parent,Child')")
 	_ = articlesCreateCmd.MarkFlagRequired("category")
 
 	articlesUpdateCmd.Flags().String("title", "", "Article title")
@@ -173,5 +175,5 @@ func init() {
 	articlesCmd.AddCommand(articlesShowCmd)
 	articlesCmd.AddCommand(articlesCreateCmd)
 	articlesCmd.AddCommand(articlesUpdateCmd)
-	rootCmd.AddCommand(articlesCmd)
+	register(func(root *cobra.Command) { root.AddCommand(articlesCmd) })
 }

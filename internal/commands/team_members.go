@@ -3,7 +3,8 @@ package commands
 import (
 	"fmt"
 
-	"github.com/neetozone/neeto-kb-cli/internal/output"
+	"github.com/neetozone/neeto-cli-commons/cli"
+	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
 )
 
@@ -69,7 +70,8 @@ var teamMembersCreateCmd = &cobra.Command{
 			return err
 		}
 
-		emails, _ := cmd.Flags().GetStringSlice("emails")
+		emailsFlag, _ := cmd.Flags().GetString("emails")
+		emails := cli.SplitCSV(emailsFlag)
 		role, _ := cmd.Flags().GetString("role")
 		sendInvite, _ := cmd.Flags().GetBool("send-invite")
 
@@ -142,7 +144,7 @@ var teamMembersDeleteCmd = &cobra.Command{
 			return err
 		}
 
-		output.PrintMessage("Team member removed.")
+		printMessage("Team member removed.")
 		return nil
 	},
 }
@@ -151,7 +153,7 @@ func init() {
 	addPaginationFlags(teamMembersListCmd)
 	teamMembersListCmd.Flags().String("email", "", "Filter by email")
 
-	teamMembersCreateCmd.Flags().StringSlice("emails", nil, "Email addresses to invite (comma-separated)")
+	teamMembersCreateCmd.Flags().String("emails", "", "Email addresses to invite (comma-separated)")
 	teamMembersCreateCmd.Flags().String("role", "", "Organization role")
 	teamMembersCreateCmd.Flags().Bool("send-invite", true, "Send invitation email")
 	_ = teamMembersCreateCmd.MarkFlagRequired("emails")
@@ -168,5 +170,5 @@ func init() {
 	teamMembersCmd.AddCommand(teamMembersCreateCmd)
 	teamMembersCmd.AddCommand(teamMembersUpdateCmd)
 	teamMembersCmd.AddCommand(teamMembersDeleteCmd)
-	rootCmd.AddCommand(teamMembersCmd)
+	register(func(root *cobra.Command) { root.AddCommand(teamMembersCmd) })
 }
