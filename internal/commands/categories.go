@@ -25,7 +25,7 @@ var categoriesListCmd = &cobra.Command{
 		}
 
 		printList(data, "categories", []output.Breadcrumb{
-			{Label: "List articles in category", Command: "neetokb articles list --category-id <id>"},
+			{Label: "List articles in category", Command: binaryName() + " articles list --category-id <id>"},
 		})
 		return nil
 	},

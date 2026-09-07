@@ -32,9 +32,9 @@ var teamMembersListCmd = &cobra.Command{
 		}
 
 		printList(data, "team_members", []output.Breadcrumb{
-			{Label: "Show", Command: "neetokb team-members show <id>"},
-			{Label: "Update", Command: "neetokb team-members update <id>"},
-			{Label: "Remove", Command: "neetokb team-members delete <id>"},
+			{Label: "Show", Command: binaryName() + " team-members show <id>"},
+			{Label: "Update", Command: binaryName() + " team-members update <id>"},
+			{Label: "Remove", Command: binaryName() + " team-members delete <id>"},
 		})
 		return nil
 	},
@@ -85,7 +85,7 @@ var teamMembersCreateCmd = &cobra.Command{
 		}
 
 		printActionResult(data, []output.Breadcrumb{
-			{Label: "List team members", Command: "neetokb team-members list"},
+			{Label: "List team members", Command: binaryName() + " team-members list"},
 		})
 		return nil
 	},

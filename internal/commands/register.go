@@ -42,6 +42,8 @@ func printActionResult(data json.RawMessage, breadcrumbs []output.Breadcrumb) {
 
 func paginationParams(cmd *cobra.Command) url.Values { return app.PaginationParams(cmd) }
 
+func binaryName() string { return app.Product.BinaryName }
+
 func addPaginationFlags(cmd *cobra.Command) { cli.AddPaginationFlags(0, cmd) }
 
 func printMessage(msg string) { app.PrintMessage(msg) }

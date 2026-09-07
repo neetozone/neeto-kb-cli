@@ -45,8 +45,8 @@ var articlesListCmd = &cobra.Command{
 		}
 
 		printList(data, "articles", []output.Breadcrumb{
-			{Label: "Show", Command: "neetokb articles show <id>"},
-			{Label: "Update", Command: "neetokb articles update <id>"},
+			{Label: "Show", Command: binaryName() + " articles show <id>"},
+			{Label: "Update", Command: binaryName() + " articles update <id>"},
 		})
 		return nil
 	},
@@ -109,7 +109,7 @@ var articlesCreateCmd = &cobra.Command{
 		}
 
 		printActionResult(data, []output.Breadcrumb{
-			{Label: "Show", Command: "neetokb articles show <id>"},
+			{Label: "Show", Command: binaryName() + " articles show <id>"},
 		})
 		return nil
 	},

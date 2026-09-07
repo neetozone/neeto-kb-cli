@@ -25,7 +25,7 @@ var searchCmd = &cobra.Command{
 		}
 
 		printList(data, "matches", []output.Breadcrumb{
-			{Label: "Show article", Command: "neetokb articles show <id>"},
+			{Label: "Show article", Command: binaryName() + " articles show <id>"},
 		})
 		return nil
 	},

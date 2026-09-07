@@ -30,7 +30,7 @@ var recommendationsListCmd = &cobra.Command{
 		}
 
 		printList(data, "recommendations", []output.Breadcrumb{
-			{Label: "List articles", Command: "neetokb articles list"},
+			{Label: "List articles", Command: binaryName() + " articles list"},
 		})
 		return nil
 	},
