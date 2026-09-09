@@ -2,6 +2,7 @@ pretty_name: NeetoKB
 binary_name: neetokb
 short_description: manage articles, categories and search from the terminal
 long_description: A command-line interface for NeetoKB. Manage articles and unlisted links, browse categories, and search your knowledge base.
+docs_url: https://apidocs.neetokb.com/cli/introduction
 api_base_path: /api/external/v2
 root_examples:
   - neetokb articles list
