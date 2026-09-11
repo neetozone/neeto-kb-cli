@@ -1,8 +1,18 @@
 package commands
 
 import (
+	"encoding/json"
+	"html"
+	"regexp"
+	"strings"
+
 	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
+)
+
+var (
+	htmlTagPattern    = regexp.MustCompile(`<[^>]*>`)
+	whitespacePattern = regexp.MustCompile(`\s+`)
 )
 
 var searchCmd = &cobra.Command{
@@ -24,11 +34,67 @@ var searchCmd = &cobra.Command{
 			return err
 		}
 
+		if rendersTable() {
+			data = compactMatches(data)
+		}
+
 		printList(data, "matches", []output.Breadcrumb{
 			{Label: "Show article", Command: "neetokb articles show <id>"},
 		})
 		return nil
 	},
+}
+
+func compactMatches(data json.RawMessage) json.RawMessage {
+	var payload map[string]json.RawMessage
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return data
+	}
+
+	var matches []map[string]interface{}
+	if err := json.Unmarshal(payload["matches"], &matches); err != nil {
+		return data
+	}
+
+	compacted := make([]map[string]interface{}, len(matches))
+	for i, match := range matches {
+		compacted[i] = map[string]interface{}{
+			"id":              match["id"],
+			"matched_content": matchedSnippet(match),
+			"url":             match["url"],
+		}
+	}
+
+	encoded, err := json.Marshal(compacted)
+	if err != nil {
+		return data
+	}
+	payload["matches"] = encoded
+
+	out, err := json.Marshal(payload)
+	if err != nil {
+		return data
+	}
+	return out
+}
+
+func matchedSnippet(match map[string]interface{}) interface{} {
+	for _, field := range []string{"matched_content", "matched_title", "matched_category"} {
+		if snippet := plainText(match[field]); snippet != "" {
+			return snippet
+		}
+	}
+	return nil
+}
+
+func plainText(value interface{}) string {
+	text, ok := value.(string)
+	if !ok {
+		return ""
+	}
+
+	text = html.UnescapeString(htmlTagPattern.ReplaceAllString(text, ""))
+	return strings.TrimSpace(whitespacePattern.ReplaceAllString(text, " "))
 }
 
 func init() {

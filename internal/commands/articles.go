@@ -163,7 +163,7 @@ func init() {
 	articlesCreateCmd.Flags().String("slug", "", "Article slug")
 	articlesCreateCmd.Flags().String("html-content", "", "Article HTML content")
 	articlesCreateCmd.Flags().String("state", "", "Article state (draft/published)")
-	articlesCreateCmd.Flags().String("category", "", "Category path (comma-separated, e.g. 'Parent,Child')")
+	articlesCreateCmd.Flags().String("category", "", "Category path, most specific first (comma-separated, e.g. 'Installation,Getting Started')")
 	_ = articlesCreateCmd.MarkFlagRequired("category")
 
 	articlesUpdateCmd.Flags().String("title", "", "Article title")
