@@ -45,3 +45,5 @@ func paginationParams(cmd *cobra.Command) url.Values { return app.PaginationPara
 func addPaginationFlags(cmd *cobra.Command) { cli.AddPaginationFlags(0, cmd) }
 
 func printMessage(msg string) { app.PrintMessage(msg) }
+
+func rendersTable() bool { return !app.Printer.Toon && !app.Printer.UseJSON() }

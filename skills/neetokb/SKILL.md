@@ -142,6 +142,17 @@ stderr. Common errors the agent should expect:
 Article commands accept the article's slug, its permalink identifier
 (`a-XXXXXXXX`), or its UUID as `<id>`.
 
+`articles create --category` takes the category path most specific first:
+`--category "Installation,Getting Started"` files the article in
+`Installation`, whose parent is `Getting Started`. Names are matched, not IDs
+or slugs, and missing categories are created.
+
+`search` prints only the article ID, the matched snippet and the article URL
+as a table, with the snippet flattened to plain text so the highlight markup
+and the article's own line breaks cannot break the column alignment. `--json`
+and `--toon` still carry every field the API returns, including `title`,
+`category`, `category_url`, `matched_title` and `matched_category`.
+
 Unlisted links exist only for published articles; requesting one for a draft
 errors with "Article must be published before an unlisted link can be
 generated." `regenerate` invalidates the previous URL immediately and takes
