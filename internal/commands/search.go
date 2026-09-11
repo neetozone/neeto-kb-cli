@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	htmlTagPattern    = regexp.MustCompile(`<[^>]*>`)
-	whitespacePattern = regexp.MustCompile(`\s+`)
+	htmlTagPattern = regexp.MustCompile(`<[^>]*>`)
+	blankPattern   = regexp.MustCompile(`[\s\x00-\x08\x0b\x0e-\x1f\x7f-\x9f]+`)
 )
 
 var searchCmd = &cobra.Command{
@@ -94,7 +94,7 @@ func plainText(value interface{}) string {
 	}
 
 	text = html.UnescapeString(htmlTagPattern.ReplaceAllString(text, ""))
-	return strings.TrimSpace(whitespacePattern.ReplaceAllString(text, " "))
+	return strings.TrimSpace(blankPattern.ReplaceAllString(text, " "))
 }
 
 func init() {
