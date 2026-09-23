@@ -9,4 +9,4 @@ root_examples:
   - neetokb search --search-term "billing"
   - neetokb categories list
 priority_fields: [name, title, email, first_name, last_name, slug, state, status, organization_role, category, url, time_zone, kind, type, disabled, default]
-commons_version: v1.1.1
+commons_version: v1.1.2
