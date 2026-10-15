@@ -132,6 +132,7 @@ stderr. Common errors the agent should expect:
 |---|---|
 | `articles` | `list`, `show`, `create`, `update` |
 | `articles unlisted-links` | `get`, `regenerate` |
+| `attachments` | `create` |
 | `categories` | `list` |
 | `authors` | `list` |
 | `recommendations` | `list` |
@@ -152,6 +153,35 @@ as a table, with the snippet flattened to plain text so the highlight markup
 and the article's own line breaks cannot break the column alignment. `--json`
 and `--toon` still carry every field the API returns, including `title`,
 `category`, `category_url`, `matched_title` and `matched_category`.
+
+`articles list --state` takes `draft`, `published` or `all` and defaults to
+published, so a full export needs `--state all`. List rows carry `created_at`,
+`updated_at`, `author`, `tags`, `url` and `category.is_private`. `--sort-by`
+takes `title`, `slug`, `state`, `category_name`, `views_count`, `created_at` or
+`updated_at`; `--order-by` takes `asc` or `desc`.
+
+`articles update --category "Installation,Getting Started"` moves an article to
+another category path, most specific first. Missing categories are created.
+
+Publishing (`create --state published`, and any update to a published article)
+needs the Manage articles permission. Drafts need Modify articles.
+
+`articles unlisted-links get` never creates a link; it fails when the article
+has none or the link expired. Use `regenerate` to create the first one. It
+replaces the old one, and the old URL stops working.
+
+`authors list` rows carry `articles_count`, `published_articles_count` and
+`draft_articles_count`. Use `--sort-by articles_count` (or `name`) with
+`--order-by asc|desc`.
+
+`categories list --flat` returns every category, including empty and private
+ones, with `is_private` and published counts. The default tree omits empty
+categories, and omits private ones for API keys.
+
+`attachments create --file ./diagram.png` or `--url https://...` uploads a
+file (`--filename` and `--content-type` override the defaults). Exactly one of
+`--url` or `--file` is allowed. Paste `.data.attachable_html` into
+`articles update --html-content`.
 
 Unlisted links exist only for published articles; requesting one for a draft
 errors with "Article must be published before an unlisted link can be
