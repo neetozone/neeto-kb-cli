@@ -20,11 +20,16 @@ var authorsListCmd = &cobra.Command{
 		}
 
 		params := paginationParams(cmd)
-		if v, _ := cmd.Flags().GetString("sort-by"); v != "" {
-			params.Set("sort_by", v)
+		sortBy, _ := cmd.Flags().GetString("sort-by")
+		orderBy, _ := cmd.Flags().GetString("order-by")
+		if err := validateSortOptions(sortBy, orderBy, []string{"name", "articles_count"}); err != nil {
+			return err
 		}
-		if v, _ := cmd.Flags().GetString("order-by"); v != "" {
-			params.Set("order_by", v)
+		if sortBy != "" {
+			params.Set("sort_by", sortBy)
+		}
+		if orderBy != "" {
+			params.Set("order_by", orderBy)
 		}
 
 		data, err := c.Get("/authors", params)

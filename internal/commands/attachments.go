@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"mime"
 	"os"
 	"path/filepath"
@@ -14,6 +15,19 @@ import (
 var attachmentsCmd = &cobra.Command{
 	Use:   "attachments",
 	Short: "Manage attachments",
+}
+
+const maxAttachmentBytes = 10 * 1024 * 1024
+
+func readAttachmentFile(path string) ([]byte, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+	if info.Size() > maxAttachmentBytes {
+		return nil, fmt.Errorf("%s is %d bytes: files larger than %d MB cannot be uploaded, use --url instead", path, info.Size(), maxAttachmentBytes/(1024*1024))
+	}
+	return os.ReadFile(path)
 }
 
 func buildAttachmentBody(url, path, filename, contentType string, readFile func(string) ([]byte, error)) (map[string]interface{}, error) {
@@ -33,6 +47,9 @@ func buildAttachmentBody(url, path, filename, contentType string, readFile func(
 	}
 	if contentType == "" {
 		contentType = mime.TypeByExtension(filepath.Ext(path))
+	}
+	if contentType == "" {
+		contentType = "application/octet-stream"
 	}
 
 	return map[string]interface{}{
@@ -56,7 +73,7 @@ var attachmentsCreateCmd = &cobra.Command{
 		filename, _ := cmd.Flags().GetString("filename")
 		contentType, _ := cmd.Flags().GetString("content-type")
 
-		body, err := buildAttachmentBody(url, path, filename, contentType, os.ReadFile)
+		body, err := buildAttachmentBody(url, path, filename, contentType, readAttachmentFile)
 		if err != nil {
 			return err
 		}

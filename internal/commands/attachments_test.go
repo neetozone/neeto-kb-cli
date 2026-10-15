@@ -2,6 +2,8 @@ package commands
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -54,4 +56,27 @@ func TestBuildAttachmentBody(t *testing.T) {
 			t.Error("expected an error")
 		}
 	})
+}
+
+func TestBuildAttachmentBody_UnknownExtensionFallsBack(t *testing.T) {
+	body, err := buildAttachmentBody("", "dir/data.unknownext", "", "", fakeRead)
+	if err != nil || body["content_type"] != "application/octet-stream" {
+		t.Errorf("body = %v, err = %v", body, err)
+	}
+}
+
+func TestReadAttachmentFile_RejectsOversizedFiles(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "big.bin")
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := f.Truncate(maxAttachmentBytes + 1); err != nil {
+		t.Fatal(err)
+	}
+	_ = f.Close()
+
+	if _, err := readAttachmentFile(path); err == nil {
+		t.Error("expected an error")
+	}
 }

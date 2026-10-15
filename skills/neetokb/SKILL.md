@@ -154,6 +154,7 @@ and the article's own line breaks cannot break the column alignment. `--json`
 and `--toon` still carry every field the API returns, including `title`,
 `category`, `category_url`, `matched_title` and `matched_category`.
 
+`--sort-by` and `--order-by` (`asc` or `desc`) are checked before the request is sent.
 `articles list --state` takes `draft`, `published` or `all` and defaults to
 published, so a full export needs `--state all`. List rows carry `created_at`,
 `updated_at`, `author`, `tags`, `url` and `category.is_private`. `--sort-by`
@@ -180,7 +181,8 @@ categories, and omits private ones for API keys.
 
 `attachments create --file ./diagram.png` or `--url https://...` uploads a
 file (`--filename` and `--content-type` override the defaults). Exactly one of
-`--url` or `--file` is allowed. Paste `.data.attachable_html` into
+`--url` or `--file` is allowed, and `--file` is capped at 10 MB (use `--url` for
+larger files). Paste `.data.attachable_html` into
 `articles update --html-content`.
 
 Unlisted links exist only for published articles; requesting one for a draft

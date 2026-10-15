@@ -19,7 +19,19 @@ func validateArticleState(state string) error {
 	return fmt.Errorf("invalid state %q: use one of %s", state, strings.Join(articleListStates, ", "))
 }
 
-func articleUpdateBody(title, slug, htmlContent, state, category string) map[string]interface{} {
+var articleSortFields = []string{"title", "slug", "state", "category_name", "views_count", "created_at", "updated_at"}
+
+func validateSortOptions(sortBy, orderBy string, sortFields []string) error {
+	if sortBy != "" && !slices.Contains(sortFields, sortBy) {
+		return fmt.Errorf("invalid sort field %q: use one of %s", sortBy, strings.Join(sortFields, ", "))
+	}
+	if orderBy != "" && orderBy != "asc" && orderBy != "desc" {
+		return fmt.Errorf("invalid order %q: use asc or desc", orderBy)
+	}
+	return nil
+}
+
+func articleBody(title, slug, htmlContent, state, category string) map[string]interface{} {
 	article := map[string]interface{}{}
 	if title != "" {
 		article["title"] = title
@@ -55,6 +67,12 @@ var articlesListCmd = &cobra.Command{
 
 		params := paginationParams(cmd)
 
+		sortBy, _ := cmd.Flags().GetString("sort-by")
+		orderBy, _ := cmd.Flags().GetString("order-by")
+		if err := validateSortOptions(sortBy, orderBy, articleSortFields); err != nil {
+			return err
+		}
+
 		if v, _ := cmd.Flags().GetString("state"); v != "" {
 			if err := validateArticleState(v); err != nil {
 				return err
@@ -64,11 +82,11 @@ var articlesListCmd = &cobra.Command{
 		if v, _ := cmd.Flags().GetString("search-term"); v != "" {
 			params.Set("search_term", v)
 		}
-		if v, _ := cmd.Flags().GetString("sort-by"); v != "" {
-			params.Set("sort_by", v)
+		if sortBy != "" {
+			params.Set("sort_by", sortBy)
 		}
-		if v, _ := cmd.Flags().GetString("order-by"); v != "" {
-			params.Set("order_by", v)
+		if orderBy != "" {
+			params.Set("order_by", orderBy)
 		}
 		if v, _ := cmd.Flags().GetString("category-id"); v != "" {
 			params.Set("category_id", v)
@@ -120,26 +138,13 @@ var articlesCreateCmd = &cobra.Command{
 		slug, _ := cmd.Flags().GetString("slug")
 		htmlContent, _ := cmd.Flags().GetString("html-content")
 		state, _ := cmd.Flags().GetString("state")
-		categoryFlag, _ := cmd.Flags().GetString("category")
-		category := cli.SplitCSV(categoryFlag)
+		category, _ := cmd.Flags().GetString("category")
 
-		article := map[string]interface{}{
-			"category": category,
-		}
-		if title != "" {
-			article["title"] = title
-		}
-		if slug != "" {
-			article["slug"] = slug
-		}
-		if htmlContent != "" {
-			article["html_content"] = htmlContent
-		}
-		if state != "" {
-			article["state"] = state
+		if err := validateArticleState(state); err != nil {
+			return err
 		}
 
-		data, err := c.Post("/articles", map[string]interface{}{"article": article})
+		data, err := c.Post("/articles", articleBody(title, slug, htmlContent, state, category))
 		if err != nil {
 			return err
 		}
@@ -167,7 +172,11 @@ var articlesUpdateCmd = &cobra.Command{
 		state, _ := cmd.Flags().GetString("state")
 		category, _ := cmd.Flags().GetString("category")
 
-		data, err := c.Patch(fmt.Sprintf("/articles/%s", args[0]), articleUpdateBody(title, slug, htmlContent, state, category))
+		if err := validateArticleState(state); err != nil {
+			return err
+		}
+
+		data, err := c.Patch(fmt.Sprintf("/articles/%s", args[0]), articleBody(title, slug, htmlContent, state, category))
 		if err != nil {
 			return err
 		}

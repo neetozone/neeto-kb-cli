@@ -6,7 +6,7 @@ import (
 )
 
 func TestArticleUpdateBody_CarriesCategoryPath(t *testing.T) {
-	body := articleUpdateBody("", "", "", "", "Installation, Getting Started")
+	body := articleBody("", "", "", "", "Installation, Getting Started")
 	article := body["article"].(map[string]interface{})
 	want := []string{"Installation", "Getting Started"}
 	if !reflect.DeepEqual(article["category"], want) {
@@ -18,7 +18,7 @@ func TestArticleUpdateBody_CarriesCategoryPath(t *testing.T) {
 }
 
 func TestArticleUpdateBody_OmitsUnsetFields(t *testing.T) {
-	article := articleUpdateBody("T", "", "", "draft", "")["article"].(map[string]interface{})
+	article := articleBody("T", "", "", "draft", "")["article"].(map[string]interface{})
 	if len(article) != 2 || article["title"] != "T" || article["state"] != "draft" {
 		t.Errorf("article = %v", article)
 	}
