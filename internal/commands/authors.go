@@ -19,7 +19,20 @@ var authorsListCmd = &cobra.Command{
 			return err
 		}
 
-		data, err := c.Get("/authors", paginationParams(cmd))
+		params := paginationParams(cmd)
+		sortBy, _ := cmd.Flags().GetString("sort-by")
+		orderBy, _ := cmd.Flags().GetString("order-by")
+		if err := validateSortOptions(sortBy, orderBy, []string{"name", "articles_count"}); err != nil {
+			return err
+		}
+		if sortBy != "" {
+			params.Set("sort_by", sortBy)
+		}
+		if orderBy != "" {
+			params.Set("order_by", orderBy)
+		}
+
+		data, err := c.Get("/authors", params)
 		if err != nil {
 			return err
 		}
@@ -33,6 +46,8 @@ var authorsListCmd = &cobra.Command{
 
 func init() {
 	addPaginationFlags(authorsListCmd)
+	authorsListCmd.Flags().String("sort-by", "", "Sort field: name or articles_count")
+	authorsListCmd.Flags().String("order-by", "", "Sort order: asc or desc")
 
 	authorsCmd.AddCommand(authorsListCmd)
 	register(func(root *cobra.Command) { root.AddCommand(authorsCmd) })

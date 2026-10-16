@@ -19,7 +19,12 @@ var categoriesListCmd = &cobra.Command{
 			return err
 		}
 
-		data, err := c.Get("/categories", paginationParams(cmd))
+		params := paginationParams(cmd)
+		if flat, _ := cmd.Flags().GetBool("flat"); flat {
+			params.Set("flat", "true")
+		}
+
+		data, err := c.Get("/categories", params)
 		if err != nil {
 			return err
 		}
@@ -33,6 +38,7 @@ var categoriesListCmd = &cobra.Command{
 
 func init() {
 	addPaginationFlags(categoriesListCmd)
+	categoriesListCmd.Flags().Bool("flat", false, "List every category, including empty and private ones, as flat rows with counts")
 
 	categoriesCmd.AddCommand(categoriesListCmd)
 	register(func(root *cobra.Command) { root.AddCommand(categoriesCmd) })

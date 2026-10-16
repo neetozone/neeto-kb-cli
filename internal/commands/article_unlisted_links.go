@@ -14,7 +14,7 @@ var articlesUnlistedLinksCmd = &cobra.Command{
 
 var articlesUnlistedLinksGetCmd = &cobra.Command{
 	Use:   "get <article-id>",
-	Short: "Fetch an article's unlisted share link, creating a never-expiring one if none exists (article-id: slug, permalink identifier a-XXXXXXXX, or UUID; article must be published)",
+	Short: "Fetch an article's existing unlisted share link; fails if it has none or it expired, so use unlisted-links regenerate to create one (article-id: slug, permalink identifier a-XXXXXXXX, or UUID; article must be published)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, err := getClient(cmd)
