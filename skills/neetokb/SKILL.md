@@ -219,7 +219,7 @@ they cannot be combined.
 
 `articles schedules create <id> --kind publish|unpublish --datetime <ISO 8601>
 --time-zone <IANA name>` needs a future time. An article has one schedule per kind,
-and when it has both, the unpublish time must come before the publish time.
+and when it has both, the unpublish time must not come after the publish time.
 `articles create` and `articles update` also take `--tags`, `--related-articles`
 (both replace the whole list; an empty value clears it) and `--note`.
 `articles show` returns `tags` as tag records and lists only published articles

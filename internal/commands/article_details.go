@@ -33,7 +33,7 @@ var articlesSchedulesListCmd = &cobra.Command{
 
 var articlesSchedulesCreateCmd = &cobra.Command{
 	Use:   "create <article-id>",
-	Short: "Schedule an article to be published or unpublished at a future time; when both kinds exist, the unpublish time must come before the publish time",
+	Short: "Schedule an article to be published or unpublished at a future time; when both kinds exist, the unpublish time must not come after the publish time",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		body := flagValues(cmd, "kind", "datetime", "time-zone", "publish-note")
