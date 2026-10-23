@@ -213,7 +213,9 @@ it into a draft hidden from the public site (`unarchive` reverses it; list with
 `articles list --state archived`). `articles discard-draft` only throws away
 unpublished draft edits and keeps the live version. `trash delete` removes a
 trashed article for good and cannot be undone. `bulk-trash` and `bulk-update`
-take `--ids` (up to 100) and are all or nothing.
+take `--ids` (up to 100) and are all or nothing. `bulk-update` needs one of
+`--category-id <id>` (move), `--state draft|published` or `--status archive|active`;
+`--state` and `--status` cannot be combined.
 
 `articles schedules create <id> --kind publish|unpublish --datetime <ISO 8601>
 --time-zone <IANA name>` needs a future time. An article has one schedule per kind,

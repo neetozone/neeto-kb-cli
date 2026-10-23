@@ -42,8 +42,11 @@ func imageSignedID(cmd *cobra.Command, value string) (string, error) {
 	var blob struct {
 		SignedID string `json:"signed_id"`
 	}
-	if err := json.Unmarshal(data, &blob); err != nil || blob.SignedID == "" {
-		return "", fmt.Errorf("upload of %s returned no signed_id", value)
+	if err := json.Unmarshal(data, &blob); err != nil {
+		return "", fmt.Errorf("upload of %s returned an unreadable response: %w", value, err)
+	}
+	if blob.SignedID == "" {
+		return "", fmt.Errorf("upload of %s returned no signed_id: %s", value, data)
 	}
 	return blob.SignedID, nil
 }
