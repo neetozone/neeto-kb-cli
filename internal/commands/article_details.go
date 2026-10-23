@@ -153,7 +153,7 @@ func init() {
 	articlesSchedulesCreateCmd.Flags().String("datetime", "", "Future date and time (ISO 8601); read in --time-zone when it has no offset")
 	articlesSchedulesCreateCmd.Flags().String("time-zone", "", "IANA time zone name, for example Asia/Kolkata")
 	articlesSchedulesCreateCmd.Flags().String("publish-note", "", "Note saved with the publication")
-	requireFlags(articlesSchedulesCreateCmd, "kind", "datetime", "time-zone")
+	markFlagsRequired(articlesSchedulesCreateCmd, "kind", "datetime", "time-zone")
 
 	articlesSeoUpdateCmd.Flags().String("title", "", "Page title")
 	articlesSeoUpdateCmd.Flags().String("title-suffix", "", "Text added after the page title")

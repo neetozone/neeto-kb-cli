@@ -50,7 +50,7 @@ var navigationLinksUpdateCmd = &cobra.Command{
 
 func init() {
 	navigationLinksUpdateCmd.Flags().String("json-file", "", `JSON file such as {"header_links":[{"label":"Docs","link":"https://example.com","kind":"external_link"}],"footer_links":[]}; each link has label, link and kind (external_link or action), and an optional id`)
-	requireFlags(navigationLinksUpdateCmd, "json-file")
+	markFlagsRequired(navigationLinksUpdateCmd, "json-file")
 
 	navigationLinksCmd.AddCommand(navigationLinksListCmd, navigationLinksUpdateCmd)
 	register(func(root *cobra.Command) { root.AddCommand(navigationLinksCmd) })

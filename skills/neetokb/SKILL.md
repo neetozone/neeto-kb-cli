@@ -171,9 +171,9 @@ and `--toon` still carry every field the API returns, including `title`,
 `category`, `category_url`, `matched_title` and `matched_category`.
 
 `--sort-by` and `--order-by` (`asc` or `desc`) are checked before the request is sent.
-`articles list --state` takes `draft`, `published` or `all` and defaults to
-published, so a full export needs `--state all`. List rows carry `created_at`,
-`updated_at`, `author`, `tags`, `url` and `category.is_private`. `--sort-by`
+`articles list --state` takes `draft`, `published`, `archived` or `all` and
+defaults to published, so a full export needs `--state all`. List rows carry
+`created_at`, `updated_at`, `author`, `tags`, `url` and `category.is_private`. `--sort-by`
 takes `title`, `slug`, `state`, `category_name`, `views_count`, `created_at` or
 `updated_at`; `--order-by` takes `asc` or `desc`.
 
@@ -207,22 +207,26 @@ generated." `regenerate` invalidates the previous URL immediately and takes
 `--expiration-type` (`never`, `one_day`, `seven_days`, `thirty_days`,
 `custom`) with `--expiration-date` required only for `custom`.
 
-Removing an article has three levels. `articles trash` moves it to the trash for
-30 days and `trash restore` brings it back. `articles archive` keeps it but turns
-it into a draft hidden from the public site (`unarchive` reverses it; list with
-`articles list --state archived`). `articles discard-draft` only throws away
-unpublished draft edits and keeps the live version. `trash delete` removes a
+`articles trash` moves an article to the trash for 30 days and `trash restore`
+brings it back. `articles archive` keeps it but turns it into a draft hidden from
+the public site; `unarchive` brings it back as a draft, and
+`articles list --state archived` lists archived articles. `articles discard-draft`
+only throws away unpublished draft edits and keeps the live version. `trash delete` removes a
 trashed article for good and cannot be undone. `bulk-trash` and `bulk-update`
-take `--ids` (up to 100) and are all or nothing. `bulk-update` needs one of
+take `--ids` (up to 100) and are all or nothing. `bulk-update` needs exactly one of
 `--category-id <id>` (move), `--state draft|published` or `--status archive|active`;
-`--state` and `--status` cannot be combined.
+they cannot be combined.
 
 `articles schedules create <id> --kind publish|unpublish --datetime <ISO 8601>
 --time-zone <IANA name>` needs a future time. An article has one schedule per kind,
-and when it has both, the unpublish time must come before the publish time. `articles create` and `articles update` also take
-`--tags`, `--related-articles` (both replace the whole list; an empty value
-clears it) and `--note`. `articles revisions restore` copies a revision into the
-draft only; the live content changes when the draft is published.
+and when it has both, the unpublish time must come before the publish time.
+`articles create` and `articles update` also take `--tags`, `--related-articles`
+(both replace the whole list; an empty value clears it) and `--note`.
+`articles show` returns `tags` as tag records and lists only published articles
+under `related_articles`, so a draft set with `--related-articles` is saved but
+does not appear there until it is published. `articles revisions restore` copies
+a revision into the draft only; the live content changes when the draft is
+published.
 
 `categories delete <id>` moves the articles and subcategories to
 `--move-to-category-id`, which a top-level category that has content needs. The last

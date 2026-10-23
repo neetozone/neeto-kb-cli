@@ -27,7 +27,7 @@ var integrationsNeetoChatCmd = &cobra.Command{
 
 func init() {
 	integrationsNeetoChatCmd.Flags().Bool("enabled", false, "Turn NeetoChat on (--enabled=false turns it off)")
-	requireFlags(integrationsNeetoChatCmd, "enabled")
+	markFlagsRequired(integrationsNeetoChatCmd, "enabled")
 
 	integrationsCmd.AddCommand(integrationsNeetoChatCmd)
 	register(func(root *cobra.Command) { root.AddCommand(integrationsCmd) })

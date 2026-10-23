@@ -96,7 +96,7 @@ func init() {
 		cmd.Flags().String("to-path", "", "New path or full URL")
 		cmd.Flags().String("type", "", "Redirection type: page (default) or domain")
 	}
-	requireFlags(redirectionsCreateCmd, "from-path", "to-path")
+	markFlagsRequired(redirectionsCreateCmd, "from-path", "to-path")
 
 	redirectionsCmd.AddCommand(redirectionsListCmd, redirectionsShowCmd, redirectionsCreateCmd, redirectionsUpdateCmd, redirectionsDeleteCmd)
 	register(func(root *cobra.Command) { root.AddCommand(redirectionsCmd) })

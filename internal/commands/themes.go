@@ -265,7 +265,7 @@ var themesFontsDeleteCmd = &cobra.Command{
 
 func init() {
 	themesUpdateCmd.Flags().String("name", "", "New theme name")
-	requireFlags(themesUpdateCmd, "name")
+	markFlagsRequired(themesUpdateCmd, "name")
 
 	themesConfigUpdateCmd.Flags().String("title-font-id", "", "ID of a font of this theme for titles")
 	themesConfigUpdateCmd.Flags().String("body-font-id", "", "ID of a font of this theme for body text")
@@ -277,7 +277,7 @@ func init() {
 
 	themesFontsCreateCmd.Flags().String("name", "", "Google font name, for example Roboto")
 	themesFontsCreateCmd.Flags().String("weights", "", "Font weights (comma-separated), for example 400,700")
-	requireFlags(themesFontsCreateCmd, "name")
+	markFlagsRequired(themesFontsCreateCmd, "name")
 	themesFontsUpdateCmd.Flags().String("name", "", "Google font name")
 	themesFontsUpdateCmd.Flags().String("weights", "", "Font weights (comma-separated)")
 

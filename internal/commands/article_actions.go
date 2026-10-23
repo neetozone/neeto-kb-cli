@@ -32,7 +32,7 @@ var articlesTrashCmd = articleAction(
 )
 
 var articlesArchiveCmd = articleAction(
-	"archive", "Archive a published article: it becomes a draft that is kept out of the public knowledge base",
+	"archive", "Archive an article: it becomes a draft that is kept out of the public knowledge base",
 	http.MethodPost, "/archive", []output.Breadcrumb{{Label: "Unarchive", Command: "neetokb articles unarchive <id>"}},
 )
 
@@ -65,7 +65,7 @@ var articlesBulkTrashCmd = &cobra.Command{
 
 var articlesBulkUpdateCmd = &cobra.Command{
 	Use:   "bulk-update",
-	Short: "Move up to 100 articles to a category, set their state, or archive or unarchive them; give one of --category-id, --state or --status",
+	Short: "Move up to 100 articles to a category, set their state, or archive or unarchive them; give exactly one of --category-id, --state or --status",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		body := flagValues(cmd, "ids[]=article_ids", "category-id", "state", "status")
 		data, err := send(cmd, http.MethodPatch, "/articles/bulk_update", body)
@@ -126,13 +126,15 @@ var trashDeleteCmd = &cobra.Command{
 
 func init() {
 	articlesBulkTrashCmd.Flags().String("ids", "", "Article IDs, slugs or permalink identifiers (comma-separated, up to 100)")
-	requireFlags(articlesBulkTrashCmd, "ids")
+	markFlagsRequired(articlesBulkTrashCmd, "ids")
 
 	articlesBulkUpdateCmd.Flags().String("ids", "", "Article IDs, slugs or permalink identifiers (comma-separated, up to 100)")
 	articlesBulkUpdateCmd.Flags().String("category-id", "", "Move the articles to this category ID")
 	articlesBulkUpdateCmd.Flags().String("state", "", "Set the state: draft or published")
 	articlesBulkUpdateCmd.Flags().String("status", "", "Set the status: archive or active")
-	requireFlags(articlesBulkUpdateCmd, "ids")
+	markFlagsRequired(articlesBulkUpdateCmd, "ids")
+	articlesBulkUpdateCmd.MarkFlagsOneRequired("category-id", "state", "status")
+	articlesBulkUpdateCmd.MarkFlagsMutuallyExclusive("category-id", "state", "status")
 
 	addPaginationFlags(trashListCmd)
 	trashCmd.AddCommand(trashListCmd, trashRestoreCmd, trashDeleteCmd)

@@ -110,7 +110,7 @@ func init() {
 		cmd.Flags().Bool("active", false, "Send events (--active=false pauses the webhook)")
 		cmd.Flags().StringArray("event", nil, "Event to send: create, update, delete, publish or unpublish; repeat for several")
 	}
-	requireFlags(webhooksCreateCmd, "endpoint")
+	markFlagsRequired(webhooksCreateCmd, "endpoint")
 
 	webhooksCmd.AddCommand(webhooksListCmd, webhooksShowCmd, webhooksCreateCmd, webhooksUpdateCmd, webhooksDeleteCmd, webhooksEventsCmd)
 	register(func(root *cobra.Command) { root.AddCommand(webhooksCmd) })

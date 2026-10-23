@@ -97,11 +97,11 @@ func init() {
 		cmd.Flags().String("description", "", "Tag description")
 		cmd.Flags().String("style", "", "Tag colour: primary, secondary, info, success, warning or danger")
 	}
-	requireFlags(tagsCreateCmd, "name")
+	markFlagsRequired(tagsCreateCmd, "name")
 
 	tagsMergeCmd.Flags().String("primary-id", "", "ID of the tag that survives")
 	tagsMergeCmd.Flags().String("secondary-ids", "", "IDs of the tags merged into the primary tag and deleted (comma-separated)")
-	requireFlags(tagsMergeCmd, "primary-id", "secondary-ids")
+	markFlagsRequired(tagsMergeCmd, "primary-id", "secondary-ids")
 
 	tagsCmd.AddCommand(tagsListCmd, tagsCreateCmd, tagsUpdateCmd, tagsDeleteCmd, tagsMergeCmd)
 	register(func(root *cobra.Command) { root.AddCommand(tagsCmd) })

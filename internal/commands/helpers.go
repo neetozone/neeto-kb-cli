@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/neetozone/neeto-cli-commons/cli"
@@ -29,11 +28,7 @@ func flagValues(cmd *cobra.Command, specs ...string) map[string]interface{} {
 
 		switch {
 		case csv:
-			list := cli.SplitCSV(flag.Value.String())
-			if list == nil {
-				list = []string{}
-			}
-			values[key] = list
+			values[key] = cli.SplitCSV(flag.Value.String())
 		case flag.Value.Type() == "bool":
 			values[key], _ = cmd.Flags().GetBool(name)
 		case flag.Value.Type() == "int":
@@ -52,25 +47,6 @@ func queryValues(cmd *cobra.Command, params url.Values, specs ...string) url.Val
 		params.Set(key, fmt.Sprint(value))
 	}
 	return params
-}
-
-func requireFlags(cmd *cobra.Command, names ...string) {
-	for _, name := range names {
-		_ = cmd.MarkFlagRequired(name)
-	}
-}
-
-func readJSONFile(path string) (map[string]interface{}, error) {
-	raw, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var payload map[string]interface{}
-	if err := json.Unmarshal(raw, &payload); err != nil {
-		return nil, fmt.Errorf("%s is not a JSON object: %w", path, err)
-	}
-	return payload, nil
 }
 
 func fetch(cmd *cobra.Command, path string, params url.Values) (json.RawMessage, error) {
@@ -94,8 +70,10 @@ func send(cmd *cobra.Command, method, path string, body any) (json.RawMessage, e
 		return c.Put(path, body)
 	case http.MethodPatch:
 		return c.Patch(path, body)
-	default:
+	case http.MethodDelete:
 		return c.DeleteWithBody(path, body)
+	default:
+		return nil, fmt.Errorf("unsupported method %s", method)
 	}
 }
 

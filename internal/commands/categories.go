@@ -128,12 +128,12 @@ func init() {
 		cmd.Flags().String("parent", "", "Parent category ID or slug")
 		cmd.Flags().Int("position", 0, "Position among sibling categories, starting at 1")
 	}
-	requireFlags(categoriesCreateCmd, "name")
+	markFlagsRequired(categoriesCreateCmd, "name")
 
 	categoriesDeleteCmd.Flags().String("move-to-category-id", "", "Category ID or slug that receives the articles and subcategories")
 
 	categoriesReorderArticlesCmd.Flags().String("article-ids", "", "Article IDs, slugs or permalink identifiers in the wanted order (comma-separated)")
-	requireFlags(categoriesReorderArticlesCmd, "article-ids")
+	markFlagsRequired(categoriesReorderArticlesCmd, "article-ids")
 
 	categoriesCmd.AddCommand(categoriesListCmd, categoriesShowCmd, categoriesCreateCmd, categoriesUpdateCmd, categoriesDeleteCmd, categoriesReorderArticlesCmd)
 	register(func(root *cobra.Command) { root.AddCommand(categoriesCmd) })

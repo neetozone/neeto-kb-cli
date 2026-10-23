@@ -29,9 +29,6 @@ func recommendationBody(cmd *cobra.Command) (map[string]interface{}, error) {
 
 	values, _ := cmd.Flags().GetStringArray("entity")
 	clearAll, _ := cmd.Flags().GetBool("clear-entities")
-	if len(values) > 0 && clearAll {
-		return nil, fmt.Errorf("give either --entity or --clear-entities")
-	}
 	if len(values) > 0 || clearAll {
 		entities, err := parseEntities(values)
 		if err != nil {
@@ -150,7 +147,8 @@ func init() {
 		cmd.Flags().StringArray("entity", nil, "Article or category to recommend as Article:<id> or Category:<id>; repeat for several")
 	}
 	recommendationsUpdateCmd.Flags().Bool("clear-entities", false, "Remove all entities from the recommendation")
-	requireFlags(recommendationsCreateCmd, "title", "url")
+	recommendationsUpdateCmd.MarkFlagsMutuallyExclusive("entity", "clear-entities")
+	markFlagsRequired(recommendationsCreateCmd, "title", "url")
 
 	recommendationsCmd.AddCommand(recommendationsListCmd, recommendationsShowCmd, recommendationsCreateCmd, recommendationsUpdateCmd, recommendationsDeleteCmd)
 	register(func(root *cobra.Command) { root.AddCommand(recommendationsCmd) })
