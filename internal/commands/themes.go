@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
@@ -138,7 +137,7 @@ var themesDeleteCmd = &cobra.Command{
 	Short: "Delete a custom theme; the published theme cannot be deleted",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/themes/%s", args[0]), url.Values{}, "Theme deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/themes/%s", args[0]), nil, "Theme deleted.")
 	},
 }
 
@@ -259,7 +258,7 @@ var themesFontsDeleteCmd = &cobra.Command{
 	Short: "Remove a font from a custom theme",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/themes/%s/fonts/%s", args[0], args[1]), url.Values{}, "Font deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/themes/%s/fonts/%s", args[0], args[1]), nil, "Font deleted.")
 	},
 }
 

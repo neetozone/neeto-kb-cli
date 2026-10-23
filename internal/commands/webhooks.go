@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
@@ -83,7 +82,7 @@ var webhooksDeleteCmd = &cobra.Command{
 	Short: "Delete a webhook",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/webhooks/%s", args[0]), url.Values{}, "Webhook deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/webhooks/%s", args[0]), nil, "Webhook deleted.")
 	},
 }
 

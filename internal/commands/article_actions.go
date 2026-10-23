@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
@@ -120,7 +119,7 @@ var trashDeleteCmd = &cobra.Command{
 	Short: "Delete a trashed article for good; this cannot be undone",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/trashed_articles/%s", args[0]), url.Values{}, "Article deleted for good.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/trashed_articles/%s", args[0]), nil, "Article deleted for good.")
 	},
 }
 

@@ -34,8 +34,8 @@ func validateSortOptions(sortBy, orderBy string, sortFields []string) error {
 	return nil
 }
 
-func articleBody(title, slug, htmlContent, state, category string) map[string]interface{} {
-	article := map[string]interface{}{}
+func articleBody(cmd *cobra.Command, title, slug, htmlContent, state, category string) map[string]interface{} {
+	article := flagValues(cmd, "tags[]", "related-articles[]=related_article_ids", "note")
 	if title != "" {
 		article["title"] = title
 	}
@@ -52,14 +52,6 @@ func articleBody(title, slug, htmlContent, state, category string) map[string]in
 		article["category"] = cli.SplitCSV(category)
 	}
 	return map[string]interface{}{"article": article}
-}
-
-func withArticleExtras(cmd *cobra.Command, body map[string]interface{}) map[string]interface{} {
-	article := body["article"].(map[string]interface{})
-	for key, value := range flagValues(cmd, "tags[]", "related-articles[]=related_article_ids", "note") {
-		article[key] = value
-	}
-	return body
 }
 
 var articlesCmd = &cobra.Command{
@@ -155,7 +147,7 @@ var articlesCreateCmd = &cobra.Command{
 			return err
 		}
 
-		data, err := c.Post("/articles", withArticleExtras(cmd, articleBody(title, slug, htmlContent, state, category)))
+		data, err := c.Post("/articles", articleBody(cmd, title, slug, htmlContent, state, category))
 		if err != nil {
 			return err
 		}
@@ -187,7 +179,7 @@ var articlesUpdateCmd = &cobra.Command{
 			return err
 		}
 
-		data, err := c.Patch(fmt.Sprintf("/articles/%s", args[0]), withArticleExtras(cmd, articleBody(title, slug, htmlContent, state, category)))
+		data, err := c.Patch(fmt.Sprintf("/articles/%s", args[0]), articleBody(cmd, title, slug, htmlContent, state, category))
 		if err != nil {
 			return err
 		}

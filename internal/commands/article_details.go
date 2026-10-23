@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
@@ -53,7 +52,7 @@ var articlesSchedulesDeleteCmd = &cobra.Command{
 	Short: "Delete a schedule",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/articles/%s/schedules/%s", args[0], args[1]), url.Values{}, "Schedule deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/articles/%s/schedules/%s", args[0], args[1]), nil, "Schedule deleted.")
 	},
 }
 

@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
@@ -83,7 +82,7 @@ var redirectionsDeleteCmd = &cobra.Command{
 	Short: "Delete a redirection",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/redirections/%s", args[0]), url.Values{}, "Redirection deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/redirections/%s", args[0]), nil, "Redirection deleted.")
 	},
 }
 

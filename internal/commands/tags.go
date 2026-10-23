@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/neetozone/neeto-cli-commons/output"
 	"github.com/spf13/cobra"
@@ -68,7 +67,7 @@ var tagsDeleteCmd = &cobra.Command{
 	Short: "Delete a tag; it is removed from every article and the articles are kept",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/tags/%s", args[0]), url.Values{}, "Tag deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/tags/%s", args[0]), nil, "Tag deleted.")
 	},
 }
 

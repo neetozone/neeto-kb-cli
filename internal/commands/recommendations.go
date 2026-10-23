@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/neetozone/neeto-cli-commons/output"
@@ -132,7 +131,7 @@ var recommendationsDeleteCmd = &cobra.Command{
 	Short: "Delete a recommendation",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return removeAndConfirm(cmd, fmt.Sprintf("/recommendations/%s", args[0]), url.Values{}, "Recommendation deleted.")
+		return removeAndConfirm(cmd, fmt.Sprintf("/recommendations/%s", args[0]), nil, "Recommendation deleted.")
 	},
 }
 
