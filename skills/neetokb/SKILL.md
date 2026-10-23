@@ -130,15 +130,31 @@ stderr. Common errors the agent should expect:
 
 | Group | Commands |
 |---|---|
-| `articles` | `list`, `show`, `create`, `update` |
+| `articles` | `list`, `show`, `create`, `update`, `trash`, `bulk-trash`, `archive`, `unarchive`, `discard-draft`, `clone`, `bulk-update` |
 | `articles unlisted-links` | `get`, `regenerate` |
-| `attachments` | `create` |
-| `categories` | `list` |
+| `articles schedules` | `list`, `create`, `delete` |
+| `articles seo` | `show`, `update` |
+| `articles revisions` | `list`, `show`, `restore` |
+| `trash` | `list`, `restore`, `delete` |
+| `attachments` | `create` (alias `upload`) |
+| `categories` | `list`, `show`, `create`, `update`, `delete`, `reorder-articles` |
+| `tags` | `list`, `create`, `update`, `delete`, `merge` |
 | `authors` | `list` |
-| `recommendations` | `list` |
+| `recommendations` | `list`, `show`, `create`, `update`, `delete` |
+| `redirections` | `list`, `show`, `create`, `update`, `delete` |
+| `navigation-links` | `list`, `update` |
+| `reports` | `popular-searches`, `failed-searches`, `invalid-urls`, `visits` |
+| `reports clear` | `popular-searches`, `failed-searches`, `invalid-urls` |
 | `search` | (top-level) full-text article search; `--search-term` required |
 | `team-members` | `list`, `show`, `create`, `update`, `delete` |
-| `workspace` | `info` |
+| `workspace` | `info`, `update` |
+| `workspace seo` | `show`, `update` |
+| `preferences` | `show`, `update` |
+| `integrations` | `neeto-chat` |
+| `themes` | `list`, `show`, `update`, `delete`, `clone`, `publish` |
+| `themes config` | `show`, `update` |
+| `themes fonts` | `create`, `update`, `delete` |
+| `webhooks` | `list`, `show`, `create`, `update`, `delete`, `events` |
 
 Article commands accept the article's slug, its permalink identifier
 (`a-XXXXXXXX`), or its UUID as `<id>`.
@@ -190,6 +206,49 @@ errors with "Article must be published before an unlisted link can be
 generated." `regenerate` invalidates the previous URL immediately and takes
 `--expiration-type` (`never`, `one_day`, `seven_days`, `thirty_days`,
 `custom`) with `--expiration-date` required only for `custom`.
+
+Removing an article has three levels. `articles trash` moves it to the trash for
+30 days and `trash restore` brings it back. `articles archive` keeps it but turns
+it into a draft hidden from the public site (`unarchive` reverses it; list with
+`articles list --state archived`). `articles discard-draft` only throws away
+unpublished draft edits and keeps the live version. `trash delete` removes a
+trashed article for good and cannot be undone. `bulk-trash` and `bulk-update`
+take `--ids` (up to 100) and are all or nothing.
+
+`articles schedules create <id> --kind publish|unpublish --datetime <ISO 8601>
+--time-zone <IANA name>` needs a future time. An article has one schedule per kind,
+and when it has both, the unpublish time must come before the publish time. `articles update` also takes
+`--tags`, `--related-articles` (both replace the whole list; an empty value
+clears it) and `--note`. `articles revisions restore` copies a revision into the
+draft only; the live content changes when the draft is published.
+
+`categories delete <id>` moves the articles and subcategories to
+`--move-to-category-id`, which a top-level category that has content needs. The last
+category cannot be deleted. `categories update --parent ""` moves a category to the
+top level. `tags merge --primary-id <id> --secondary-ids a,b` keeps the primary tag
+and deletes the secondary tags after giving their articles the primary tag.
+
+`reports` commands take `--duration` (`all_time`, `last_24_hours`, `last_7_days`,
+`this_week`, `last_week`, `last_30_days`, `this_month`, `last_month`, `this_quarter`,
+`last_quarter` or `custom`); `custom` needs both `--start-date` and `--end-date`.
+`reports clear` deletes the data for that period for good, and everything of that
+kind when no period is given. `navigation-links update --json-file links.json` takes
+`{"header_links":[...],"footer_links":[...]}`; a set that is sent replaces the whole
+set and links left out are deleted. `redirections create --type` is `page` (default)
+or `domain`. `recommendations create --entity Article:<id>` can repeat; on update
+`--entity` replaces all entities and `--clear-entities` removes them.
+
+`themes publish <id>` makes that theme live on the public site. Built-in themes
+cannot be edited: run `themes clone <id>`, then change the clone with
+`themes config update <id> --color header-bg=#ffffff --custom-css ...`.
+`--brand-image` and `--header-image` take a local file, which is uploaded first, or a
+signed ID from `attachments create`. A published theme cannot be deleted.
+
+A webhook secret is write-only: set it with `webhooks create|update --secret` and it
+is never shown again. `--event` repeats (`create`, `update`, `delete`, `publish`,
+`unpublish`); on update it replaces the list. `preferences` belongs to a signed-in
+user, so it works with a CLI login and fails with an API key. `workspace update` and
+`workspace seo update` take `--allow-signup=false` style booleans.
 
 Run `neetokb commands` for the authoritative flag list, and see
 <https://apidocs.neetokb.com/cli/introduction> for the full reference.

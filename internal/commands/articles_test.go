@@ -128,7 +128,7 @@ func TestArticlesList_RejectsInvalidOptions(t *testing.T) {
 		args []string
 		want string
 	}{
-		{"state", []string{"--state", "archived"}, `invalid state "archived": use one of draft, published, all`},
+		{"state", []string{"--state", "deleted"}, `invalid state "deleted": use one of draft, published, archived, all`},
 		{"sort field", []string{"--sort-by", "name"}, `invalid sort field "name": use one of title, slug, state, category_name, views_count, created_at, updated_at`},
 		{"order", []string{"--order-by", "up"}, `invalid order "up": use asc or desc`},
 	}

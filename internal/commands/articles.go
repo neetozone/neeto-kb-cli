@@ -10,13 +10,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var articleListStates = []string{"draft", "published", "all"}
+var (
+	articleStates     = []string{"draft", "published", "all"}
+	articleListStates = []string{"draft", "published", "archived", "all"}
+)
 
-func validateArticleState(state string) error {
-	if state == "" || slices.Contains(articleListStates, state) {
+func validateArticleState(state string, allowed []string) error {
+	if state == "" || slices.Contains(allowed, state) {
 		return nil
 	}
-	return fmt.Errorf("invalid state %q: use one of %s", state, strings.Join(articleListStates, ", "))
+	return fmt.Errorf("invalid state %q: use one of %s", state, strings.Join(allowed, ", "))
 }
 
 var articleSortFields = []string{"title", "slug", "state", "category_name", "views_count", "created_at", "updated_at"}
@@ -51,6 +54,14 @@ func articleBody(title, slug, htmlContent, state, category string) map[string]in
 	return map[string]interface{}{"article": article}
 }
 
+func withArticleExtras(cmd *cobra.Command, body map[string]interface{}) map[string]interface{} {
+	article := body["article"].(map[string]interface{})
+	for key, value := range flagValues(cmd, "tags[]", "related-articles[]=related_article_ids", "note") {
+		article[key] = value
+	}
+	return body
+}
+
 var articlesCmd = &cobra.Command{
 	Use:   "articles",
 	Short: "Manage articles",
@@ -74,7 +85,7 @@ var articlesListCmd = &cobra.Command{
 		}
 
 		if v, _ := cmd.Flags().GetString("state"); v != "" {
-			if err := validateArticleState(v); err != nil {
+			if err := validateArticleState(v, articleListStates); err != nil {
 				return err
 			}
 			params.Set("state", v)
@@ -140,11 +151,11 @@ var articlesCreateCmd = &cobra.Command{
 		state, _ := cmd.Flags().GetString("state")
 		category, _ := cmd.Flags().GetString("category")
 
-		if err := validateArticleState(state); err != nil {
+		if err := validateArticleState(state, articleStates); err != nil {
 			return err
 		}
 
-		data, err := c.Post("/articles", articleBody(title, slug, htmlContent, state, category))
+		data, err := c.Post("/articles", withArticleExtras(cmd, articleBody(title, slug, htmlContent, state, category)))
 		if err != nil {
 			return err
 		}
@@ -172,11 +183,11 @@ var articlesUpdateCmd = &cobra.Command{
 		state, _ := cmd.Flags().GetString("state")
 		category, _ := cmd.Flags().GetString("category")
 
-		if err := validateArticleState(state); err != nil {
+		if err := validateArticleState(state, articleStates); err != nil {
 			return err
 		}
 
-		data, err := c.Patch(fmt.Sprintf("/articles/%s", args[0]), articleBody(title, slug, htmlContent, state, category))
+		data, err := c.Patch(fmt.Sprintf("/articles/%s", args[0]), withArticleExtras(cmd, articleBody(title, slug, htmlContent, state, category)))
 		if err != nil {
 			return err
 		}
@@ -188,7 +199,7 @@ var articlesUpdateCmd = &cobra.Command{
 
 func init() {
 	addPaginationFlags(articlesListCmd)
-	articlesListCmd.Flags().String("state", "", "Filter by state: draft, published or all (default: published)")
+	articlesListCmd.Flags().String("state", "", "Filter by state: draft, published, archived or all (default: published)")
 	articlesListCmd.Flags().String("search-term", "", "Search term")
 	articlesListCmd.Flags().String("sort-by", "", "Sort field: title, slug, state, category_name, views_count, created_at, updated_at")
 	articlesListCmd.Flags().String("order-by", "", "Sort order: asc or desc")
@@ -199,6 +210,7 @@ func init() {
 	articlesCreateCmd.Flags().String("html-content", "", "Article HTML content")
 	articlesCreateCmd.Flags().String("state", "", "Article state (draft/published)")
 	articlesCreateCmd.Flags().String("category", "", "Category path, most specific first (comma-separated, e.g. 'Installation,Getting Started')")
+	articlesCreateCmd.Flags().String("tags", "", "Tag names (comma-separated); missing tags are created")
 	_ = articlesCreateCmd.MarkFlagRequired("category")
 
 	articlesUpdateCmd.Flags().String("title", "", "Article title")
@@ -206,6 +218,9 @@ func init() {
 	articlesUpdateCmd.Flags().String("html-content", "", "Article HTML content")
 	articlesUpdateCmd.Flags().String("state", "", "Article state (draft/published)")
 	articlesUpdateCmd.Flags().String("category", "", "New category path, most specific first, comma-separated; missing categories are created")
+	articlesUpdateCmd.Flags().String("tags", "", "Tag names (comma-separated) that replace all tags; missing tags are created, an empty value removes all")
+	articlesUpdateCmd.Flags().String("related-articles", "", "Related article IDs, slugs or permalink identifiers (comma-separated) that replace all related articles; an empty value removes all")
+	articlesUpdateCmd.Flags().String("note", "", "Internal note; an empty value deletes it")
 
 	articlesCmd.AddCommand(articlesListCmd)
 	articlesCmd.AddCommand(articlesShowCmd)

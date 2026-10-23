@@ -8,5 +8,5 @@ root_examples:
   - neetokb articles list
   - neetokb search --search-term "billing"
   - neetokb categories list
-priority_fields: [name, title, email, first_name, last_name, slug, state, status, organization_role, category, url, time_zone, kind, type, disabled, default]
+priority_fields: [name, title, email, first_name, last_name, slug, state, status, organization_role, category, url, time_zone, kind, type, disabled, default, keyword, search_count, urls_count, visits_count, accessed_on, from_path, to_path, redirection_type, endpoint, is_active, label, link, articles_count, matching_criteria, published, system]
 commons_version: v1.2.0
