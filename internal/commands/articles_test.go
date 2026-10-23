@@ -45,7 +45,7 @@ func TestArticlesCreate_OmitsUnsetFields(t *testing.T) {
 
 func TestArticlesCreate_RejectsUnknownState(t *testing.T) {
 	req, _, err := runCommand(t, `{}`, "articles", "create", "--category", "Installation", "--state", "archived")
-	if err == nil || err.Error() != `invalid state "archived": use one of draft, published, all` {
+	if err == nil || err.Error() != `invalid state "archived": use one of draft, published` {
 		t.Errorf("err = %v", err)
 	}
 	if req.Method != "" {

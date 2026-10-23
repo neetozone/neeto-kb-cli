@@ -217,7 +217,7 @@ take `--ids` (up to 100) and are all or nothing.
 
 `articles schedules create <id> --kind publish|unpublish --datetime <ISO 8601>
 --time-zone <IANA name>` needs a future time. An article has one schedule per kind,
-and when it has both, the unpublish time must come before the publish time. `articles update` also takes
+and when it has both, the unpublish time must come before the publish time. `articles create` and `articles update` also take
 `--tags`, `--related-articles` (both replace the whole list; an empty value
 clears it) and `--note`. `articles revisions restore` copies a revision into the
 draft only; the live content changes when the draft is published.

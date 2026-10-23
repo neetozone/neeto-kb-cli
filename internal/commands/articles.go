@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	articleStates     = []string{"draft", "published", "all"}
+	articleStates     = []string{"draft", "published"}
 	articleListStates = []string{"draft", "published", "archived", "all"}
 )
 
@@ -211,6 +211,8 @@ func init() {
 	articlesCreateCmd.Flags().String("state", "", "Article state (draft/published)")
 	articlesCreateCmd.Flags().String("category", "", "Category path, most specific first (comma-separated, e.g. 'Installation,Getting Started')")
 	articlesCreateCmd.Flags().String("tags", "", "Tag names (comma-separated); missing tags are created")
+	articlesCreateCmd.Flags().String("related-articles", "", "Related article IDs, slugs or permalink identifiers (comma-separated)")
+	articlesCreateCmd.Flags().String("note", "", "Internal note")
 	_ = articlesCreateCmd.MarkFlagRequired("category")
 
 	articlesUpdateCmd.Flags().String("title", "", "Article title")
