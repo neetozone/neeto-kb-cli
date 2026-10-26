@@ -31,10 +31,15 @@ var buildApp sync.Once
 
 func resetFlags(cmd *cobra.Command) {
 	reset := func(flag *pflag.Flag) {
-		if flag.Changed {
-			_ = flag.Value.Set(flag.DefValue)
-			flag.Changed = false
+		if !flag.Changed {
+			return
 		}
+		if slice, ok := flag.Value.(pflag.SliceValue); ok {
+			_ = slice.Replace(nil)
+		} else {
+			_ = flag.Value.Set(flag.DefValue)
+		}
+		flag.Changed = false
 	}
 	cmd.Flags().VisitAll(reset)
 	cmd.PersistentFlags().VisitAll(reset)

@@ -60,8 +60,9 @@ func buildAttachmentBody(url, path, filename, contentType string, readFile func(
 }
 
 var attachmentsCreateCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Upload an attachment from a URL or a local file",
+	Use:     "create",
+	Short:   "Upload an attachment from a URL or a local file",
+	Aliases: []string{"upload"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		c, err := getClient(cmd)
 		if err != nil {

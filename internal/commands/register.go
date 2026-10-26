@@ -46,4 +46,8 @@ func addPaginationFlags(cmd *cobra.Command) { cli.AddPaginationFlags(0, cmd) }
 
 func printMessage(msg string) { app.PrintMessage(msg) }
 
+func markFlagsRequired(cmd *cobra.Command, names ...string) { cli.MarkFlagsRequired(cmd, names...) }
+
+func readJSONFile(path string) (map[string]any, error) { return cli.ReadJSONFile(path) }
+
 func rendersTable() bool { return !app.Printer.Toon && !app.Printer.UseJSON() }
