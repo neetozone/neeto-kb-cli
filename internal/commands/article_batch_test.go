@@ -24,7 +24,7 @@ func TestArticlesBatchCreate_BareArrayFileIsPostedWrappedInArticles(t *testing.T
 		t.Fatal(err)
 	}
 
-	if req.Method != "POST" || req.Path != "/api/external/v2/articles/batch_create" {
+	if req.Method != "POST" || req.Path != "/api/external/v2/articles/bulk" {
 		t.Errorf("request = %s %s", req.Method, req.Path)
 	}
 	want := map[string]interface{}{
@@ -45,7 +45,7 @@ func TestArticlesBatchUpdate_ObjectFileIsPatchedAsTheBody(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if req.Method != "PATCH" || req.Path != "/api/external/v2/articles/batch_update" {
+	if req.Method != "PATCH" || req.Path != "/api/external/v2/articles/bulk" {
 		t.Errorf("request = %s %s", req.Method, req.Path)
 	}
 	want := map[string]interface{}{

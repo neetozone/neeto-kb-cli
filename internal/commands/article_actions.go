@@ -52,7 +52,7 @@ var articlesBulkTrashCmd = &cobra.Command{
 	Use:   "bulk-trash",
 	Short: "Move up to 100 articles to the trash; if one cannot be trashed none are",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		data, err := send(cmd, http.MethodDelete, "/articles/bulk_destroy", flagValues(cmd, "ids[]=article_ids"))
+		data, err := send(cmd, http.MethodDelete, "/articles/bulk", flagValues(cmd, "ids[]=article_ids"))
 		if err != nil {
 			return err
 		}
@@ -67,7 +67,7 @@ var articlesBulkUpdateCmd = &cobra.Command{
 	Short: "Move up to 100 articles to a category, set their state, or archive or unarchive them; give exactly one of --category-id, --state or --status",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		body := flagValues(cmd, "ids[]=article_ids", "category-id", "state", "status")
-		data, err := send(cmd, http.MethodPatch, "/articles/bulk_update", body)
+		data, err := send(cmd, http.MethodPatch, "/articles/bulk", body)
 		if err != nil {
 			return err
 		}

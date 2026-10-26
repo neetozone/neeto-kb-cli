@@ -11,7 +11,7 @@ func TestArticlesBulkUpdate_StatusIsSentWithTheArticleIDs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if req.Method != "PATCH" || req.Path != "/api/external/v2/articles/bulk_update" {
+	if req.Method != "PATCH" || req.Path != "/api/external/v2/articles/bulk" {
 		t.Errorf("request = %s %s", req.Method, req.Path)
 	}
 	want := map[string]interface{}{"article_ids": []interface{}{"a1", "a2"}, "status": "archive"}

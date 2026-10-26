@@ -63,7 +63,7 @@ The batch is all or nothing: if one item fails, no article is saved and the erro
 from 1. Items are saved in order, so related_article_ids may name the slug of an earlier item.
 
 This differs from "articles bulk-update", which applies one shared change to many existing articles.`,
-	RunE: runArticleBatch(http.MethodPost, "/articles/batch_create", []output.Breadcrumb{
+	RunE: runArticleBatch(http.MethodPost, "/articles/bulk", []output.Breadcrumb{
 		{Label: "Show", Command: "neetokb articles show <id>"},
 	}),
 }
@@ -81,7 +81,7 @@ Items are saved in order, so related_article_ids may name a slug set by an earli
 only once in a batch.
 
 This differs from "articles bulk-update", which applies one shared change (category, state or status) to many articles.`,
-	RunE: runArticleBatch(http.MethodPatch, "/articles/batch_update", []output.Breadcrumb{
+	RunE: runArticleBatch(http.MethodPatch, "/articles/bulk", []output.Breadcrumb{
 		{Label: "Show", Command: "neetokb articles show <id>"},
 	}),
 }
