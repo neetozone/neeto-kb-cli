@@ -130,7 +130,7 @@ stderr. Common errors the agent should expect:
 
 | Group | Commands |
 |---|---|
-| `articles` | `list`, `show`, `create`, `update`, `trash`, `bulk-trash`, `archive`, `unarchive`, `discard-draft`, `clone`, `bulk-update` |
+| `articles` | `list`, `show`, `create`, `update`, `trash`, `bulk-trash`, `archive`, `unarchive`, `discard-draft`, `clone`, `bulk-update`, `batch-create`, `batch-update` |
 | `articles unlisted-links` | `get`, `regenerate` |
 | `articles schedules` | `list`, `create`, `delete` |
 | `articles seo` | `show`, `update` |
@@ -216,6 +216,17 @@ trashed article for good and cannot be undone. `bulk-trash` and `bulk-update`
 take `--ids` (up to 100) and are all or nothing. `bulk-update` needs exactly one of
 `--category-id <id>` (move), `--state draft|published` or `--status archive|active`;
 they cannot be combined.
+
+`articles batch-create --json-file <file>` creates and `articles batch-update --json-file <file>`
+updates 1 to 25 articles in one call. The file is a JSON array of items or `{"articles":[...]}`.
+A create item needs `title`, `html_content` and `category` (names, innermost first) and may have
+`state` (`draft` default or `published`), `slug`, `tags`, `related_article_ids` and `note`. An
+update item needs `article_id` (slug, permalink identifier or UUID) plus at least one of `title`,
+`html_content`, `slug`, `state`, `category`, `tags`, `related_article_ids`, `note`. Both are all
+or nothing: if one item fails nothing is saved and the error names the item, counting from 1.
+Items are saved in order, so a later item's `related_article_ids` can name an earlier item's
+slug. In `batch-update` an article may appear only once. Unlike `bulk-update`, which applies one
+shared change to many articles, each batch item carries its own values.
 
 `articles schedules create <id> --kind publish|unpublish --datetime <ISO 8601>
 --time-zone <IANA name>` needs a future time. An article has one schedule per kind,
