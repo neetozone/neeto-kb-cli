@@ -1,13 +1,13 @@
 package commands
 
 import (
-	"encoding/json"
+	json "encoding/json/v2"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/neetozone/neeto-cli-commons/output"
+	"github.com/neetozone/neeto-cli-commons/v2/output"
 	"github.com/spf13/cobra"
 )
 

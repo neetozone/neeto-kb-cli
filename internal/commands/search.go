@@ -1,12 +1,13 @@
 package commands
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"html"
 	"regexp"
 	"strings"
 
-	"github.com/neetozone/neeto-cli-commons/output"
+	"github.com/neetozone/neeto-cli-commons/v2/output"
 	"github.com/spf13/cobra"
 )
 
@@ -45,8 +46,8 @@ var searchCmd = &cobra.Command{
 	},
 }
 
-func compactMatches(data json.RawMessage) json.RawMessage {
-	var payload map[string]json.RawMessage
+func compactMatches(data jsontext.Value) jsontext.Value {
+	var payload map[string]jsontext.Value
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return data
 	}
@@ -65,13 +66,13 @@ func compactMatches(data json.RawMessage) json.RawMessage {
 		}
 	}
 
-	encoded, err := json.Marshal(compacted)
+	encoded, err := json.Marshal(compacted, output.JSONOptions)
 	if err != nil {
 		return data
 	}
 	payload["matches"] = encoded
 
-	out, err := json.Marshal(payload)
+	out, err := json.Marshal(payload, output.JSONOptions)
 	if err != nil {
 		return data
 	}
