@@ -1,12 +1,13 @@
 package commands
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"testing"
 )
 
 func TestCompactMatches_KeepsOnlyIdSnippetAndURL(t *testing.T) {
-	data := json.RawMessage(`{
+	data := jsontext.Value(`{
 		"matches": [
 			{
 				"id": "f58c9e57",
@@ -73,7 +74,7 @@ func TestCompactMatches_FallsBackToTitleThenCategory(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			data := json.RawMessage(`{"matches": [` + tt.match + `]}`)
+			data := jsontext.Value(`{"matches": [` + tt.match + `]}`)
 
 			var payload struct {
 				Matches []map[string]interface{} `json:"matches"`
@@ -132,7 +133,7 @@ func TestPlainText_FlattensWithoutLosingContent(t *testing.T) {
 }
 
 func TestCompactMatches_KeepsEveryPaginationField(t *testing.T) {
-	data := json.RawMessage(`{
+	data := jsontext.Value(`{
 		"matches": [{ "id": "f58c9e57", "url": "http://example.test/articles/a", "matched_content": "hit" }],
 		"pagination": { "total_records": 42, "total_pages": 2, "current_page_number": 1, "page_size": 25 }
 	}`)
@@ -156,9 +157,9 @@ func TestCompactMatches_KeepsEveryPaginationField(t *testing.T) {
 }
 
 func TestCompactMatches_LeavesUnexpectedPayloadsAlone(t *testing.T) {
-	for _, data := range []json.RawMessage{
-		json.RawMessage(`{"errors": ["Search term is required"]}`),
-		json.RawMessage(`not json`),
+	for _, data := range []jsontext.Value{
+		jsontext.Value(`{"errors": ["Search term is required"]}`),
+		jsontext.Value(`not json`),
 	} {
 		if got := string(compactMatches(data)); got != string(data) {
 			t.Errorf("compactMatches(%s) = %s, want it untouched", data, got)

@@ -1,13 +1,13 @@
 package commands
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/neetozone/neeto-cli-commons/cli"
+	"github.com/neetozone/neeto-cli-commons/v2/cli"
 	"github.com/spf13/cobra"
 )
 
@@ -49,7 +49,7 @@ func queryValues(cmd *cobra.Command, params url.Values, specs ...string) url.Val
 	return params
 }
 
-func fetch(cmd *cobra.Command, path string, params url.Values) (json.RawMessage, error) {
+func fetch(cmd *cobra.Command, path string, params url.Values) (jsontext.Value, error) {
 	c, err := getClient(cmd)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func fetch(cmd *cobra.Command, path string, params url.Values) (json.RawMessage,
 	return c.Get(path, params)
 }
 
-func send(cmd *cobra.Command, method, path string, body any) (json.RawMessage, error) {
+func send(cmd *cobra.Command, method, path string, body any) (jsontext.Value, error) {
 	c, err := getClient(cmd)
 	if err != nil {
 		return nil, err
